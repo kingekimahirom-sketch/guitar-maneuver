@@ -28,17 +28,29 @@
             padding: 20px;
         }
 
-        /* 小さくなっていた画面の横幅を900pxに完全復活 */
         .container { max-width: 900px; margin: 0 auto; }
 
+        /* ヘッダーのレイアウトを元のシンプルな形に戻す */
         header {
             border-bottom: 2px solid var(--accent-purple);
             padding-bottom: 10px;
             margin-bottom: 25px;
         }
 
-        h1 { color: var(--accent-purple); margin: 0; font-size: 1.4rem; letter-spacing: 2px; }
-        .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-top: 5px; }
+        h1 { color: var(--accent-purple); margin: 0; font-size: 1.8rem; letter-spacing: 2px; }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+
+        /* PROGRESSION RADAR と完全に統一した戻るリンクのスタイル */
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--accent-purple); /* スケールのテーマカラーに合わせる場合はここ */
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
 
         .control-panel {
             background-color: var(--panel-bg);
@@ -56,7 +68,6 @@
             letter-spacing: 1px;
         }
 
-        /* ポジション切り替えボタン専用のグリッド */
         .position-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -229,7 +240,6 @@
     </header>
 
     <div class="control-panel">
-        <!-- 新設：ポジション選択エリア -->
         <div class="section-title">0. Select Position (表示するポジションのデータを切り替えます)</div>
         <div class="position-grid">
             <button id="btn-pos1" class="pos-btn active" onclick="changePosition('position1')">Position 1</button>
@@ -262,6 +272,9 @@
         <div class="fretboard" id="fretboardGrid"></div>
         <div class="fret-labels" id="fretLabels"></div>
     </div>
+
+    <!-- 最下部に PROGRESSION RADAR と同じテキストリンクを配置 -->
+    <a href="index.html" class="back-link">← メインメニューに戻る</a>
 </div>
 
 <script>
@@ -269,7 +282,6 @@
     let activeLayers = { major_scale: true, melodic_minor: false, major_penta: false, minor_penta: false };
     let selectedChord = null;
 
-    // 全4ポジションのデータを完全格納
     const excelModel = {
         position1: {
             scales: {
@@ -309,7 +321,7 @@
             scales: {
                 major_scale: [[null, '〇', null, '〇', '〇'], [null, '〇', '〇', null, '〇'], ['〇', '〇', null, '〇', null], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '〇'], [null, '〇', null, '〇', '〇']],
                 melodic_minor: [['〇', '・', '〇', '・', '〇'], [null, '〇', '〇', null, '〇'], ['・', '〇', null, '〇', null], [null, '〇', '〇', '・', '〇'], [null, '〇', null, '〇', '〇'], ['〇', '・', '〇', '・', '〇']],
-                major_penta: [[null, '〇', null, '・', '〇'], [null, '〇', '・', null, '〇'], ['・', '〇', null, '〇', null], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '・'], [[1], '〇', null, '・', '〇']],
+                major_penta: [[null, '〇', null, '・', '〇'], [null, '〇', '・', null, '〇'], ['・', '〇', null, '〇', null], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '・'], [ null, '〇', null, '・', '〇']],
                 minor_penta: [['〇', '・', '〇', '・', '〇'], [null, '・', '〇', null, '・'], ['・', '〇', null, '〇', null], [null, '・', '〇', '・', '〇'], [null, '・', '〇', '・', '〇'], ['〇', '・', '〇', '・', '〇']]
             },
             chords: {
@@ -327,7 +339,7 @@
                 major_scale: [[null, '〇', '〇', null, '〇'], [null, '〇', '〇', null, '〇'], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '〇'], [null, '〇', null, '〇', '〇'], [null, '〇', '〇', null, '〇']],
                 melodic_minor: [[null, '〇', '〇', null, '〇'], [null, '〇', '・', '〇', '・'], [null, '〇', '〇', '・', '〇'], [null, '〇', null, '〇', '〇'], ['〇', '・', '〇', '・', '〇'], [null, '〇', '〇', null, '〇']],
                 major_penta: [[null, '〇', '・', null, '〇'], [null, '・', '〇', null, '〇'], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '・'], [null, '〇', null, '・', '〇'], [null, '〇', '・', null, '〇']],
-                minor_penta: [['〇', '・', '〇', null, '・'], [null, '・', '〇', null, '・'], [null, '・', '〇', '・', '〇'], [null, '・', '〇', '・', '〇'], ['〇', '・', '〇', '・', '〇'], ['〇', '・', '〇', null, '・']]
+                minor_penta: [['〇', '・', '〇', null, '・'], [null, '・', '〇', null, '----'], [null, '・', '〇', '・', '〇'], [null, '・', '〇', '・', '〇'], ['〇', '・', '〇', '・', '〇'], ['〇', '・', '〇', null, '・']]
             },
             chords: {
                 IM7: [[null, '〇', '・', null, '〇'], [null, '〇', '◎', null, '・'], [null, '〇', null, '・', null], [null, '・', null, '〇', '・'], [null, '〇', null, '〇', '◎'], [null, '〇', '・', null, '〇']],
@@ -420,7 +432,6 @@
         }
     }
 
-    // 新設：ポジション切り替え関数
     function changePosition(posName) {
         currentPosition = posName;
         document.querySelectorAll('.pos-btn').forEach((btn, idx) => {
