@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROGRESSION RADAR - Cyber Jazz Commander</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --accent-cyan: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #f0883e;
+            --text-color: #c9d1d9;
+            --text-muted: #8b949e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            border-bottom: 2px solid var(--accent-cyan);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* 進行選択タブ */
+        .tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background-color: var(--panel-bg);
+            border: 1px solid #30363d;
+            color: var(--text-color);
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-cyan);
+            color: var(--bg-color);
+            border-color: var(--accent-cyan);
+        }
+
+        /* レーダーパネル（メイン表示） */
+        .radar-panel {
+            background-color: var(--panel-bg);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .prog-title {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* コード表示ブロック */
+        .chord-chain {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .chord-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px 15px;
+            text-align: center;
+        }
+
+        .chord-name {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .chord-deg {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        /* 解説カード */
+        .analysis-box {
+            border-left: 4px solid var(--accent-orange);
+            background: rgba(240, 136, 62, 0.05);
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .analysis-box h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-orange);
+        }
+
+        .analysis-box p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* 戻るリンク */
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>HARMONIC TRAJECTORY RADAR</h1>
+        <div class="subtitle">SYSTEM VERSION 2.0 // DEGREES ONLY GRID</div>
+    </header>
+
+    <!-- タブメニュー -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchProgression('major', event)">II - V - I - VI</button>
+        <button class="tab-btn" onclick="switchProgression('sdm', event)">IVM7 - IVm7 - III - VI</button>
+        <button class="tab-btn" onclick="switchProgression('backdoor', event)">IIm7 - ♭VII7 - IM7</button>
+    </div>
+
+    <!-- レーダーメイン表示 -->
+    <div class="radar-panel">
+        <h2 id="progTitle" class="prog-title">LOADING SYSTEM...</h2>
+
+        <!-- コード表示エリア -->
+        <div class="chord-chain" id="chordChain">
+            <!-- JSで動的に挿入されます -->
+        </div>
+
+        <!-- 司令部解説 -->
+        <div class="analysis-box">
+            <h4>TACTICAL BRIEFING (ソロギター攻略の鍵)</h4>
+            <p id="analysisText">LOADING...</p>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-link">← メインメニューに戻る</a>
+</div>
+
+<script>
+    const progressions = {
+        major: {
+            title: "王道 MAJOR II-V-I-VI 進行",
+            chords: [
+                { name: "IIm7", deg: "2nd minor" },
+                { name: "V7", deg: "5th dominant" },
+                { name: "IM7", deg: "1st tonic" },
+                { name: "VI7", deg: "6th secondary" }
+            ],
+            briefing: "ジャズのあらゆる曲の着地に使われる超重要進行です。V7からIM7へ着地する際、V7の3度と7度が、IM7のルートと3度へ半音で滑らかに吸い込まれるライン（ガイドトーン）を、ソロギターのトップノートやインサイドボイスで意識すると、一気にジャズらしい洗練された響きになります。常に指板のCAGED各フォームでこの度数配置を追えるようにしましょう。"
+        },
+        sdm: {
+            title: "切なさを生み出す SUBDOMINANT MINOR",
+            chords: [
+                { name: "IVM7", deg: "4th major" },
+                { name: "IVm7", deg: "4th minor" },
+                { name: "IIIm7", deg: "3rd minor" },
+                { name: "VI7", deg: "6th dominant" }
+            ],
+            briefing: "現在練習中の『Just Friends』の冒頭を司る魔術的な進行です。4度メジャーから4度マイナーへ変化するときの、コードトーンの『半音降下（メジャー3度 ➔ マイナー3度）』をギター指板上で途切れさせずに滑らかに繋ぐことが、ソロギターで最も美味しい表現ポイントになります。"
+        },
+        backdoor: {
+            title: "裏口からの奇襲 BACKDOOR DOMINANT",
+            chords: [
+                { name: "IIm7", deg: "2nd minor" },
+                { name: "♭VII7", deg: "backdoor dom." },
+                { name: "IM7", deg: "1st tonic" },
+                { name: "IM7", deg: "1st tonic" }
+            ],
+            briefing: "通常のII-V-Iの『V7』の代わりに、半音上の『♭VII7』を置いてトニック（IM7）に解決する、モダンでフワッとした浮遊感のある進行です。本質的にはサブドミナントマイナー（IVm7）の代理。ルートが全音下からIM7へと滑り込む独特なベースラインの跳躍と、上部構造の整合性を脳内で同期させる訓練に最適です。"
+        }
+    };
+
+    function switchProgression(type, event) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        if (event && event.target) {
+            event.target.classList.add('active');
+        } else {
+            document.querySelector('.tabs .tab-btn').classList.add('active');
+        }
+
+        const prog = progressions[type];
+        
+        document.getElementById('progTitle').innerText = prog.title;
+        document.getElementById('analysisText').innerText = prog.briefing;
+
+        const chainContainer = document.getElementById('chordChain');
+        chainContainer.innerHTML = '';
+        
+        prog.chords.forEach(chord => {
+            const box = document.createElement('div');
+            box.className = 'chord-box';
+            box.innerHTML = `
+                <div class="chord-name">${chord.name}</div>
+                <div class="chord-deg">${chord.deg}</div>
+            `;
+            chainContainer.appendChild(box);
+        });
+    }
+
+    window.onload = function() {
+        switchProgression('major');
+    };
+</script>
+</body>
+</html>
