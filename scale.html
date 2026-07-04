@@ -3,376 +3,452 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ギター指板表示モデル</title>
+    <title>FRETBOARD VISUALIZATION SYSTEM - MULTI POSITIONS</title>
     <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --accent-purple: #bc8cff;
+            --text-color: #c9d1d9;
+            --text-muted: #8b949e;
+            
+            /* スケール別カラー */
+            --color-major: #3fb950;
+            --color-mms: #ff7b72;
+            --color-mpenta: #58a6ff;
+            --color-minpenta: #f2c744;
+        }
+
         body {
-            font-family: sans-serif;
-            background-color: #f0f0f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
-        /* 前回のグレー背景のコントロールパネル */
-        .controls {
-            background-color: #e0e0e0;
-            padding: 15px;
+        /* 小さくなっていた画面の横幅を900pxに完全復活 */
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header {
+            border-bottom: 2px solid var(--accent-purple);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        h1 { color: var(--accent-purple); margin: 0; font-size: 1.4rem; letter-spacing: 2px; }
+        .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-top: 5px; }
+
+        .control-panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 500px;
-            box-sizing: border-box;
-        }
-
-        .control-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .control-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .control-row label {
-            width: 100px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .control-row select {
-            flex: 1;
-            padding: 5px;
-            font-size: 14px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        /* ポジション・表示切り替え用のボタンデザイン */
-        .btn-group {
-            display: flex;
-            gap: 5px;
-            flex: 1;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 6px 10px;
-            font-size: 13px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-            color: #333;
-            transition: background-color 0.1s;
-        }
-
-        .btn:hover {
-            background-color: #f5f5f5;
-        }
-
-        .btn.active {
-            background-color: #666;
-            color: #fff;
-            border-color: #666;
-        }
-
-        /* 前回の指板デザインそのまま */
-        .fretboard-container {
-            background-color: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow-x: auto;
-            width: 100%;
-            max-width: 500px;
-            box-sizing: border-box;
+            margin-bottom: 25px;
         }
 
-        .fretboard {
+        .section-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ポジション切り替えボタン専用のグリッド */
+        .position-grid {
             display: grid;
-            grid-template-columns: 40px repeat(5, 1fr);
-            border-right: 2px solid #999;
-            background-color: #fff;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .cell {
-            border-bottom: 1px solid #ccc;
-            height: 40px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* 最後の弦（1弦）の下線は消す */
-        .string-1 {
-            border-bottom: none;
-        }
-
-        /* フレットの縦線（ナット以外） */
-        .fret-line {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: #999;
-        }
-
-        /* ナット（開放弦側） */
-        .is-nut {
-            background-color: #eaeaea;
-            border-right: 4px solid #333;
-            border-bottom: 1px solid #ccc;
-        }
-        .is-nut.string-1 {
-            border-bottom: none;
-        }
-        .is-nut .fret-line {
-            display: none;
-        }
-
-        /* 音のマーク */
-        .note {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
+        .pos-btn {
+            background-color: #21262d;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 5px;
+            border-radius: 6px;
             font-weight: bold;
-            z-index: 10;
-        }
-
-        .note-root {
-            background-color: #ffcccc;
-            color: #cc0000;
-            border: 2px solid #cc0000;
-        }
-
-        .note-chord {
-            background-color: #ccffff;
-            color: #0000cc;
-            border: 1px solid #0000cc;
-        }
-
-        .note-scale {
-            background-color: #e0e0e0;
-            color: #666;
-            border: 1px solid #666;
-        }
-
-        /* フレット番号の表示 */
-        .fret-labels {
-            display: grid;
-            grid-template-columns: 40px repeat(5, 1fr);
-            margin-top: 10px;
+            cursor: pointer;
             text-align: center;
-            font-size: 12px;
-            color: #666;
+            font-size: 0.85rem;
+            transition: all 0.15s ease;
+        }
+        .pos-btn.active {
+            background: rgba(188, 140, 255, 0.15);
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+            box-shadow: 0 0 10px rgba(188, 140, 255, 0.3);
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .layer-btn {
+            background-color: #21262d;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 5px;
+            border-radius: 6px;
             font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.85rem;
+            transition: all 0.15s ease;
+        }
+
+        .layer-btn#btn-major_scale.active { background: rgba(63, 185, 80, 0.15); border-color: var(--color-major); color: var(--color-major); }
+        .layer-btn#btn-melodic_minor.active { background: rgba(255, 123, 114, 0.15); border-color: var(--color-mms); color: var(--color-mms); }
+        .layer-btn#btn-major_penta.active { background: rgba(88, 166, 255, 0.15); border-color: var(--color-mpenta); color: var(--color-mpenta); }
+        .layer-btn#btn-minor_penta.active { background: rgba(242, 199, 68, 0.15); border-color: var(--color-minpenta); color: var(--color-minpenta); }
+
+        .chord-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .chord-btn {
+            background-color: #21262d;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 0;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .chord-btn:hover { color: #fff; border-color: #8b949e; }
+        .chord-btn.active {
+            background-color: #fff;
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .fretboard-container {
+            background: #161b22;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            overflow-x: auto;
+        }
+
+        .fretboard { display: flex; flex-direction: column; width: 100%; min-width: 600px; }
+
+        .string {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+        }
+        .string::before {
+            content: ""; position: absolute; left: 0; right: 0; top: 29px;
+            height: 2px; background: #484f58; z-index: 1; opacity: 0.5;
+        }
+
+        .fret {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-right: 4px solid #21262d;
+        }
+        .fret-0 { border-left: 5px solid #8b949e; }
+
+        .note {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 0.8rem; font-weight: 800; color: transparent;
+            background-color: transparent; 
+            display: none; 
+            z-index: 10;
+            transition: all 0.12s ease-in-out;
+        }
+        
+        .note.major_scale { border: 2.5px solid var(--color-major); box-shadow: 0 0 8px rgba(63, 185, 80, 0.4); }
+        .note.melodic_minor { border: 2.5px solid var(--color-mms); box-shadow: 0 0 8px rgba(255, 123, 114, 0.4); }
+        .note.major_penta { border: 2.5px solid var(--color-mpenta); box-shadow: 0 0 8px rgba(88, 166, 255, 0.4); }
+        .note.minor_penta { border: 2.5px solid var(--color-minpenta); box-shadow: 0 0 8px rgba(242, 199, 68, 0.4); }
+
+        .note.scale-overlap {
+            border: 4px solid #ffffff !important;
+            box-shadow: 0 0 12px rgba(188, 140, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        .note.chord-on {
+            color: #ffffff !important;
+            font-family: 'Arial Black', sans-serif;
+            transform: scale(1.15);
+            box-shadow: 0 0 20px #fff;
+            border: 2px solid #fff !important;
+            animation: pulse 1.5s infinite alternate;
+        }
+        
+        .note.chord-root {
+            background-color: #ffffff !important;
+            color: #0d1117 !important;
+            border: 3px solid var(--accent-purple) !important;
+            font-size: 0.85rem;
+            font-weight: 900;
+        }
+
+        .fretboard.dim-mode .note:not(.chord-on) {
+            opacity: 0.15;
+            transform: scale(0.8);
+            box-shadow: none;
+        }
+
+        .fret-labels { display: flex; width: 100%; min-width: 600px; margin-top: 15px; }
+        .fret-label { flex: 1; text-align: center; font-size: 0.8rem; color: var(--text-muted); font-family: monospace; font-weight: bold; }
+
+        @keyframes pulse {
+            from { box-shadow: 0 0 10px rgba(255,255,255,0.4); }
+            to { box-shadow: 0 0 22px rgba(255,255,255,0.9); }
         }
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <!-- ポジション切り替えボタン行 -->
-        <div class="control-row">
-            <label>Position</label>
-            <div class="btn-group" id="pos-group">
-                <button class="btn active" onclick="setParams('position1', null)">1</button>
-                <button class="btn" onclick="setParams('position2', null)">2</button>
-                <button class="btn" onclick="setParams('position3', null)">3</button>
-                <button class="btn" onclick="setParams('position4', null)">4</button>
-            </div>
+<div class="container">
+    <header>
+        <h1>FRETBOARD VISUALIZATION SYSTEM</h1>
+        <div class="subtitle">MODEL MULTI-POSITIONS // オール・ネオンエッジUI</div>
+    </header>
+
+    <div class="control-panel">
+        <!-- 新設：ポジション選択エリア -->
+        <div class="section-title">0. Select Position (表示するポジションのデータを切り替えます)</div>
+        <div class="position-grid">
+            <button id="btn-pos1" class="pos-btn active" onclick="changePosition('position1')">Position 1</button>
+            <button id="btn-pos2" class="pos-btn" onclick="changePosition('position2')">Position 2</button>
+            <button id="btn-pos3" class="pos-btn" onclick="changePosition('position3')">Position 3</button>
+            <button id="btn-pos4" class="pos-btn" onclick="changePosition('position4')">Position 4</button>
         </div>
 
-        <!-- スケール / コードトーン切り替えボタン行 -->
-        <div class="control-row">
-            <label>表示タイプ</label>
-            <div class="btn-group" id="type-group">
-                <button class="btn active" onclick="setParams(null, 'scale')">スケール</button>
-                <button class="btn" onclick="setParams(null, 'chord')">コード</button>
-            </div>
+        <div class="section-title">1. Scale Layers (複数選択時に共通音が「太い白の輪郭」に切り替わります)</div>
+        <div class="matrix-grid">
+            <button id="btn-major_scale" class="layer-btn active" onclick="toggleLayer('major_scale')">Major Scale</button>
+            <button id="btn-melodic_minor" class="layer-btn" onclick="toggleLayer('melodic_minor')">Melodic Minor</button>
+            <button id="btn-major_penta" class="layer-btn" onclick="toggleLayer('major_penta')">Major Penta</button>
+            <button id="btn-minor_penta" class="layer-btn" onclick="toggleLayer('minor_penta')">Minor Penta</button>
         </div>
 
-        <!-- 詳細メニュー -->
-        <div class="control-row">
-            <label>メニュー</label>
-            <select id="item-selector" onchange="render()"></select>
+        <div class="section-title">2. Diatonic Chord Tones (選択するとコード構成音とルート「R」が浮かび上がります)</div>
+        <div class="chord-grid">
+            <button class="chord-btn" onclick="toggleChord('IM7')">ⅠM7</button>
+            <button class="chord-btn" onclick="toggleChord('IIm7')">Ⅱm7</button>
+            <button class="chord-btn" onclick="toggleChord('IIIm7')">Ⅲm7</button>
+            <button class="chord-btn" onclick="toggleChord('IVM7')">ⅣM7</button>
+            <button class="chord-btn" onclick="toggleChord('V7')">Ⅴ7</button>
+            <button class="chord-btn" onclick="toggleChord('VIm7')">Ⅵm7</button>
+            <button class="chord-btn" onclick="toggleChord('VIIm7b5')">Ⅶm7♭5</button>
         </div>
     </div>
 
     <div class="fretboard-container">
-        <div class="fretboard" id="board"></div>
-        <div class="fret-labels">
-            <div>開放</div>
-            <div>FretA</div>
-            <div>FretB</div>
-            <div>FretC</div>
-            <div>FretD</div>
-            <div>FretE</div>
-        </div>
+        <div class="fretboard" id="fretboardGrid"></div>
+        <div class="fret-labels" id="fretLabels"></div>
     </div>
+</div>
 
-    <script>
-        // 抽出した全4ポジションのデータを完全格納
-        const data = {
-            "position1": {
-                "major_scale": [["⚪︎", null, "⚪︎", null, "⚪︎"], [null, null, "⚪︎", null, "⚪︎"], [null, "⚪︎", "⚪︎", null, "⚪︎"], [null, "⚪︎", "⚪︎", null, "⚪︎"], ["⚪︎", null, "⚪︎", null, "⚪︎"], ["⚪︎", null, "⚪︎", null, "⚪︎"]],
-                "melodic_minor": [["⚪︎", null, "⚪︎", null, "⚪︎"], [null, "⚪︎", "・", "⚪︎", "・"], [null, "⚪︎", "⚪︎", null, "⚪︎"], ["⚪︎", "・", "⚪︎", null, "⚪︎"], ["⚪︎", null, "⚪︎", "⚪︎", "・"], ["⚪︎", null, "⚪︎", null, "⚪︎"]],
-                "major_penta": [["⚪︎", null, "⚪︎", null, "⚪︎"], [null, null, "⚪︎", null, "・"], [null, "⚪︎", "・", null, "⚪︎"], [null, "・", "⚪︎", null, "⚪︎"], ["・", null, "⚪︎", null, "⚪︎"], ["⚪︎", null, "⚪︎", null, "⚪︎"]],
-                "minor_penta": [["⚪︎", null, "・", "⚪︎", "・"], ["⚪︎", null, "・", "⚪︎", "・"], ["⚪︎", "・", "⚪︎", null, "・"], ["⚪︎", "・", "⚪︎", null, "・"], ["⚪︎", null, "⚪︎", null, "・"], ["⚪︎", null, "・", "⚪︎", "・"]],
-                "IM7": [["◎", null, "・", null, "〇"], [null, null, "・", null, "〇"], [null, "〇", "・", null, "〇"], [null, "〇", "◎", null, "・"], ["・", null, "〇", null, "・"], ["◎", null, "・", null, "〇"]],
-                "IIm7": [["〇", null, "◎", null, "・"], [null, null, "〇", null, "・"], [null, "・", "〇", null, "----"], [null, "・", "〇", null, "◎"], ["〇", null, "・", null, "〇"], ["〇", null, "◎", null, "・"]],
-                "IIIm7": [["・", null, "〇", null, "◎"], [null, null, "・", null, "〇"], [null, "◎", "・", null, "〇"], [null, "〇", "・", null, "〇"], ["・", null, "〇", null, "・"], ["・", null, "〇", null, "◎"]],
-                "IVM7": [["〇", null, "・", null, "〇"], [null, null, "〇", null, "・"], [null, "〇", "◎", null, "・"], [null, "・", "〇", null, "・"], ["◎", null, "・", null, "〇"], ["〇", null, "・", null, "〇"]],
-                "V7": [["・", null, "〇", null, "・"], [null, null, "・", null, "〇"], [null, "・", "〇", null, "◎"], [null, "〇", "・", null, "〇"], ["〇", null, "◎", null, "・"], ["・", null, "〇", null, "・"]],
-                "VIm7": [["〇", null, "・", null, "〇"], [null, null, "◎", null, "・"], [null, "〇", "・", null, "〇"], [null, "・", "〇", null, "・"], ["・", null, "〇", null, "◎"], ["〇", null, "・", null, "〇"]],
-                "VIIm7b5": [["・", null, "〇", null, "・"], [null, null, "〇", null, "◎"], [null, "・", "〇", null, "・"], [null, "◎", "・", null, "〇"], ["〇", null, "・", null, "〇"], ["・", null, "〇", null, "・"]]
+<script>
+    let currentPosition = 'position1';
+    let activeLayers = { major_scale: true, melodic_minor: false, major_penta: false, minor_penta: false };
+    let selectedChord = null;
+
+    // 全4ポジションのデータを完全格納
+    const excelModel = {
+        position1: {
+            scales: {
+                major_scale: [['⚪︎', null, '⚪︎', null, '⚪︎'], [null, null, '⚪︎', null, '⚪︎'], [null, '⚪︎', '⚪︎', null, '⚪︎'], [null, '⚪︎', '⚪︎', null, '⚪︎'], ['⚪︎', null, '⚪︎', null, '⚪︎'], ['⚪︎', null, '⚪︎', null, '⚪︎']],
+                melodic_minor: [['⚪︎', null, '⚪︎', null, '⚪︎'], [null, '⚪︎', '・', '⚪︎', '・'], [null, '⚪︎', '⚪︎', null, '⚪︎'], ['⚪︎', '・', '⚪︎', null, '⚪︎'], ['⚪︎', null, '⚪︎', '⚪︎', '・'], ['⚪︎', null, '⚪︎', null, '⚪︎']],
+                major_penta: [['⚪︎', null, '⚪︎', null, '⚪︎'], [null, null, '⚪︎', null, '・'], [null, '⚪︎', '・', null, '⚪︎'], [null, '・', '⚪︎', null, '⚪︎'], ['・', null, '⚪︎', null, '⚪︎'], ['⚪︎', null, '⚪︎', null, '⚪︎']],
+                minor_penta: [['⚪︎', null, '・', '⚪︎', '・'], ['⚪︎', null, '・', '⚪︎', '・'], ['⚪︎', '・', '⚪︎', null, '・'], ['⚪︎', '・', '⚪︎', null, '・'], ['⚪︎', null, '⚪︎', null, '・'], ['⚪︎', null, '・', '⚪︎', '・']]
             },
-            "position2": {
-                "major_scale": [["〇", null, "〇", null, "〇"], [null, null, "〇", "〇", null], [null, "〇", "〇", null, "〇"], ["〇", null, "〇", null, "〇"], ["〇", null, "〇", null, "〇"], ["〇", null, "〇", null, "〇"]],
-                "melodic_minor": [["〇", "〇", "・", "〇", "・"], [null, null, "〇", "〇", null], [1, "・", "〇", null, "〇"], ["〇", null, "〇", "〇", "・"], ["〇", null, "〇", null, "〇"], ["〇", "〇", "・", "〇", "・"]],
-                "major_penta": [["〇", null, "〇", null, "・"], [null, null, "〇", "・", null], [null, "・", "〇", null, "〇"], ["・", null, "〇", null, "〇"], ["〇", null, "〇", null, "〇"], ["〇", null, "〇", null, "・"]],
-                "minor_penta": [["・", "〇", "・", "〇", "・"], [null, "〇", "・", "〇", null], ["〇", "・", "〇", null, "・"], ["〇", null, "・", "〇", "・"], ["〇", null, "・", "〇", "・"], ["・", "〇", "・", "〇", "・"]],
-                "IM7": [["〇", null, "・", null, "〇"], [null, null, "〇", "・", null], [null, "〇", "◎", null, "・"], ["・", null, "〇", null, "・"], ["◎", null, "・", null, "〇"], ["〇", null, "・", null, "〇"]],
-                "IIm7": [["・", null, "〇", null, "・"], [null, null, "・", "〇", null], [null, "・", "〇", null, "◎"], ["〇", null, "・", null, "〇"], ["〇", null, "◎", null, "・"], ["・", null, "〇", null, "・"]],
-                "IIIm7": [["〇", null, "・", null, "〇"], [null, null, "◎", "・", null], [null, "〇", "・", null, "〇"], ["・", null, "〇", null, "・"], ["・", null, "〇", null, "◎"], ["〇", null, "・", null, "〇"]],
-                "IVM7": [["・", null, "〇", null, "・"], [null, null, "〇", "◎", null], [null, "・", "〇", null, "・"], ["◎", null, "・", null, "〇"], ["〇", null, "・", null, "〇"], ["・", null, "〇", null, "・"]],
-                "V7": [["◎", null, "・", null, "〇"], [null, null, "・", "〇", null], [null, "〇", "・", null, "〇"], ["〇", null, "◎", null, "・"], ["・", null, "〇", null, "・"], ["◎", null, "・", null, "〇"]],
-                "VIm7": [["〇", null, "◎", null, "・"], [null, null, "〇", "・", null], [null, "・", "〇", null, "・"], ["・", null, "〇", null, "◎"], ["〇", null, "・", null, "〇"], ["〇", null, "◎", null, "・"]],
-                "VIIm7b5": [["・", null, "〇", null, "◎"], [null, null, "・", "〇", null], [null, "◎", "・", null, "〇"], ["〇", null, "・", null, "〇"], ["・", null, "〇", null, "・"], ["・", null, "〇", null, "◎"]]
+            chords: {
+                IM7: [['◎', null, '・', null, '〇'], [null, null, '・', null, '〇'], [null, '〇', '・', null, '〇'], [null, '〇', '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇']],
+                IIm7: [['〇', null, '◎', null, '・'], [null, null, '〇', null, '・'], [null, '・', '〇', null, '----'], [null, '・', '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・']],
+                IIIm7: [['・', null, '〇', null, '◎'], [null, null, '・', null, '〇'], [null, '◎', '・', null, '〇'], [null, '〇', '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎']],
+                IVM7: [['〇', null, '・', null, '〇'], [null, null, '〇', null, '・'], [null, '〇', '◎', null, '・'], [null, '・', '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇']],
+                V7: [['・', null, '〇', null, '・'], [null, null, '・', null, '〇'], [null, '・', '〇', null, '◎'], [null, '〇', '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・']],
+                VIm7: [['〇', null, '・', null, '〇'], [null, null, '◎', null, '・'], [null, '〇', '・', null, '〇'], [null, '・', '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇']],
+                VIIm7b5: [['・', null, '〇', null, '・'], [null, null, '〇', null, '◎'], [null, '・', '〇', null, '・'], [null, '◎', '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・']]
+            }
+        },
+        position2: {
+            scales: {
+                major_scale: [['〇', null, '〇', null, '〇'], [null, null, '〇', '〇', null], [null, '〇', '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', null, '〇']],
+                melodic_minor: [['〇', '〇', '・', '〇', '・'], [null, null, '〇', '〇', null], [1, '・', '〇', null, '〇'], ['〇', null, '〇', '〇', '・'], ['〇', null, '〇', null, '〇'], ['〇', '〇', '・', '〇', '・']],
+                major_penta: [['〇', null, '〇', null, '・'], [null, null, '〇', '・', null], [null, '・', '〇', null, '〇'], ['・', null, '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', null, '・']],
+                minor_penta: [['・', '〇', '・', '〇', '・'], [null, '〇', '・', '〇', null], ['〇', '・', '〇', null, '・'], ['〇', null, '・', '〇', '・'], ['〇', null, '・', '〇', '・'], ['・', '〇', '・', '〇', '・']]
             },
-            "position3": {
-                "major_scale": [[null, "〇", null, "〇", "〇"], [null, "〇", "〇", null, "〇"], ["〇", "〇", null, "〇", null], [null, "〇", null, "〇", null], [null, "〇", null, "〇", "〇"], [null, "〇", null, "〇", "〇"]],
-                "melodic_minor": [["〇", "・", "〇", "・", "〇"], [null, "〇", "〇", null, "〇"], ["・", "〇", null, "〇", null], [null, "〇", "〇", "・", "〇"], [null, "〇", null, "〇", "〇"], ["〇", "・", "〇", "・", "〇"]],
-                "major_penta": [[null, "〇", null, "・", "〇"], [null, "〇", "・", null, "〇"], ["・", "〇", null, "〇", null], [null, "〇", null, "〇", null], [null, "〇", null, "〇", "・"], [[1], "〇", null, "・", "〇"]],
-                "minor_penta": [["〇", "・", "〇", "・", "〇"], [null, "・", "〇", null, "・"], ["・", "〇", null, "〇", null], [null, "・", "〇", "・", "〇"], [null, "・", "〇", "・", "〇"], ["〇", "・", "〇", "・", "〇"]],
-                "IM7": [[null, "・", null, "〇", "◎"], [null, "〇", "・", null, "〇"], ["〇", "◎", null, "・", null], [null, "〇", null, "・", null], [null, "・", null, "〇", "・"], [null, "・", null, "〇", "◎"]],
-                "IIm7": [[null, "〇", null, "・", "〇"], [null, "・", "〇", null, "・"], ["・", "〇", null, "◎", null], [null, "・", null, "〇", null], [null, "◎", null, "・", "〇"], [null, "〇", null, "・", "〇"]],
-                "IIIm7": [[null, "・", null, "〇", "・"], [null, "◎", "・", null, "〇"], ["〇", "・", null, "〇", null], [null, "〇", null, "・", null], [null, "〇", null, "◎", "・"], [null, "・", null, "〇", "・"]],
-                "IVM7": [[null, "〇", null, "・", "〇"], [null, "〇", "◎", null, "・"], ["・", "〇", null, "・", null], [null, "・", null, "〇", null], [null, "・", null, "〇", "◎"], [null, "〇", null, "・", "〇"]],
-                "V7": [[null, "・", null, "〇", "・"], [null, "・", "〇", null, "◎"], ["〇", "・", null, "〇", null], [null, "◎", null, "・", null], [null, "〇", null, "・", "〇"], [null, "・", null, "〇", "・"]],
-                "VIm7": [[null, "◎", null, "・", "〇"], [null, "〇", "・", null, "〇"], ["・", "〇", null, "・", null], [null, "〇", null, "◎", null], [null, "・", null, "〇", "・"], [null, "◎", null, "・", "〇"]],
-                "VIIm7b5": [[null, "〇", null, "◎", "・"], [null, "・", "〇", null, "・"], ["◎", "・", null, "〇", null], [null, "・", null, "〇", null], [null, "〇", null, "・", "〇"], [null, "〇", null, "◎", "・"]]
+            chords: {
+                IM7: [['〇', null, '・', null, '〇'], [null, null, '〇', '・', null], [null, '〇', '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇']],
+                IIm7: [['・', null, '〇', null, '・'], [null, null, '・', '〇', null], [null, '・', '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・']],
+                IIIm7: [['〇', null, '・', null, '〇'], [null, null, '◎', '・', null], [null, '〇', '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇']],
+                IVM7: [['・', null, '〇', null, '・'], [null, null, '〇', '◎', null], [null, '・', '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・']],
+                V7: [['◎', null, '・', null, '〇'], [null, null, '・', '〇', null], [null, '〇', '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇']],
+                VIm7: [['〇', null, '◎', null, '・'], [null, null, '〇', '・', null], [null, '・', '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・']],
+                VIIm7b5: [['・', null, '〇', null, '◎'], [null, null, '・', '〇', null], [null, '◎', '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎']]
+            }
+        },
+        position3: {
+            scales: {
+                major_scale: [[null, '〇', null, '〇', '〇'], [null, '〇', '〇', null, '〇'], ['〇', '〇', null, '〇', null], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '〇'], [null, '〇', null, '〇', '〇']],
+                melodic_minor: [['〇', '・', '〇', '・', '〇'], [null, '〇', '〇', null, '〇'], ['・', '〇', null, '〇', null], [null, '〇', '〇', '・', '〇'], [null, '〇', null, '〇', '〇'], ['〇', '・', '〇', '・', '〇']],
+                major_penta: [[null, '〇', null, '・', '〇'], [null, '〇', '・', null, '〇'], ['・', '〇', null, '〇', null], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '・'], [[1], '〇', null, '・', '〇']],
+                minor_penta: [['〇', '・', '〇', '・', '〇'], [null, '・', '〇', null, '・'], ['・', '〇', null, '〇', null], [null, '・', '〇', '・', '〇'], [null, '・', '〇', '・', '〇'], ['〇', '・', '〇', '・', '〇']]
             },
-            "position4": {
-                "major_scale": [[null, "〇", "〇", null, "〇"], [null, "〇", "〇", null, "〇"], [null, "〇", null, "〇", null], [null, "〇", null, "〇", "〇"], [null, "〇", null, "〇", "〇"], [null, "〇", "〇", null, "〇"]],
-                "melodic_minor": [[null, "〇", "〇", null, "〇"], [null, "〇", "・", "〇", "・"], [null, "〇", "〇", "・", "〇"], [null, "〇", null, "〇", "〇"], ["〇", "・", "〇", "・", "〇"], [null, "〇", "〇", null, "〇"]],
-                "major_penta": [[null, "〇", "・", null, "〇"], [null, "・", "〇", null, "〇"], [null, "〇", null, "〇", null], [null, "〇", null, "〇", "・"], [null, "〇", null, "・", "〇"], [null, "〇", "・", null, "〇"]],
-                "minor_penta": [["〇", "・", "〇", null, "・"], [null, "・", "〇", null, "・"], [null, "・", "〇", "・", "〇"], [null, "・", "〇", "・", "〇"], ["〇", "・", "〇", "・", "〇"], ["〇", "・", "〇", null, "・"]],
-                "IM7": [[null, "〇", "・", null, "〇"], [null, "〇", "◎", null, "・"], [null, "〇", null, "・", null], [null, "・", null, "〇", "・"], [null, "〇", null, "〇", "◎"], [null, "〇", "・", null, "〇"]],
-                "IIm7": [[null, "・", "〇", null, "・"], [null, "・", "〇", null, "◎"], [null, "・", null, "〇", null], [null, "◎", null, "・", "〇"], [null, "〇", null, "・", "〇"], [null, "・", "〇", null, "・"]],
-                "IIIm7": [[null, "◎", "・", null, "〇"], [null, "〇", "・", null, "〇"], [null, "〇", null, "・", null], [null, "〇", null, "◎", "・"], [null, "・", null, "〇", "・"], [null, "◎", "・", null, "〇"]],
-                "IVM7": [[null, "〇", "◎", null, "・"], [null, "・", "〇", null, "・"], [null, "・", null, "〇", null], [null, "・", null, "〇", "◎"], [null, "〇", null, "・", "〇"], [null, "〇", "◎", null, "・"]],
-                "V7": [[null, "・", "〇", null, "◎"], [null, "〇", "・", null, "〇"], [null, "◎", null, "・", null], [null, "〇", null, "・", "〇"], [null, "・", null, "〇", "・"], [null, "・", "〇", null, "◎"]],
-                "VIm7": [[null, "〇", "・", null, "〇"], [null, "・", "〇", null, "・"], [null, "〇", null, "◎", null], [null, "・", null, "〇", "・"], [null, "◎", null, "・", "〇"], [null, "〇", "・", null, "〇"]],
-                "VIIm7b5": [[null, "・", "〇", null, "・"], [null, "◎", "・", null, "〇"], [null, "・", null, "〇", null], [null, "〇", null, "・", "〇"], [null, "〇", null, "◎", "・"], [null, "・", "〇", null, "・"]]
+            chords: {
+                IM7: [[null, '・', null, '〇', '◎'], [null, '〇', '・', null, '〇'], ['〇', '◎', null, '・', null], [null, '〇', null, '・', null], [null, '・', null, '〇', '・'], [null, '・', null, '〇', '◎']],
+                IIm7: [[null, '〇', null, '・', '〇'], [null, '・', '〇', null, '・'], ['・', '〇', null, '◎', null], [null, '・', null, '〇', null], [null, '◎', null, '・', '〇'], [null, '〇', null, '・', '〇']],
+                IIIm7: [[null, '・', null, '〇', '・'], [null, '◎', '・', null, '〇'], ['〇', '・', null, '〇', null], [null, '〇', null, '・', null], [null, '〇', null, '◎', '・'], [null, '・', null, '〇', '・']],
+                IVM7: [[null, '〇', null, '・', '〇'], [null, '〇', '◎', null, '・'], ['・', '〇', null, '・', null], [null, '・', null, '〇', null], [null, '・', null, '〇', '◎'], [null, '〇', null, '・', '〇']],
+                V7: [[null, '・', null, '〇', '・'], [null, '・', '〇', null, '◎'], ['〇', '・', null, '〇', null], [null, '◎', null, '・', null], [null, '〇', null, '・', '〇'], [null, '・', null, '〇', '・']],
+                VIm7: [[null, '◎', null, '・', '〇'], [null, '〇', '・', null, '〇'], ['・', '〇', null, '・', null], [null, '〇', null, '◎', null], [null, '・', null, '〇', '・'], [null, '◎', null, '・', '〇']],
+                VIIm7b5: [[null, '〇', null, '◎', '・'], [null, '・', '〇', null, '・'], ['◎', '・', null, '〇', null], [null, '・', null, '〇', null], [null, '〇', null, '・', '〇'], [null, '〇', null, '◎', '・']]
             }
-        };
-
-        const menus = {
-            scale: [
-                { value: 'major_scale', text: 'Major Scale' },
-                { value: 'melodic_minor', text: 'Melodic Minor' },
-                { value: 'major_penta', text: 'Major Penta' },
-                { value: 'minor_penta', text: 'Minor Penta' }
-            ],
-            chord: [
-                { value: 'IM7', text: 'IM7' },
-                { value: 'IIm7', text: 'IIm7' },
-                { value: 'IIIm7', text: 'IIIm7' },
-                { value: 'IVM7', text: 'IVM7' },
-                { value: 'V7', text: 'V7' },
-                { value: 'VIm7', text: 'VIm7' },
-                { value: 'VIIm7b5', text: 'VIIm7b5' }
-            ]
-        };
-
-        let currentPos = 'position1';
-        let currentType = 'scale';
-
-        function setParams(pos, type) {
-            if (pos) {
-                currentPos = pos;
-                const buttons = document.querySelectorAll('#pos-group .btn');
-                buttons.forEach((b, i) => b.classList.toggle('active', `position${i+1}` === pos));
+        },
+        position4: {
+            scales: {
+                major_scale: [[null, '〇', '〇', null, '〇'], [null, '〇', '〇', null, '〇'], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '〇'], [null, '〇', null, '〇', '〇'], [null, '〇', '〇', null, '〇']],
+                melodic_minor: [[null, '〇', '〇', null, '〇'], [null, '〇', '・', '〇', '・'], [null, '〇', '〇', '・', '〇'], [null, '〇', null, '〇', '〇'], ['〇', '・', '〇', '・', '〇'], [null, '〇', '〇', null, '〇']],
+                major_penta: [[null, '〇', '・', null, '〇'], [null, '・', '〇', null, '〇'], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '・'], [null, '〇', null, '・', '〇'], [null, '〇', '・', null, '〇']],
+                minor_penta: [['〇', '・', '〇', null, '・'], [null, '・', '〇', null, '・'], [null, '・', '〇', '・', '〇'], [null, '・', '〇', '・', '〇'], ['〇', '・', '〇', '・', '〇'], ['〇', '・', '〇', null, '・']]
+            },
+            chords: {
+                IM7: [[null, '〇', '・', null, '〇'], [null, '〇', '◎', null, '・'], [null, '〇', null, '・', null], [null, '・', null, '〇', '・'], [null, '〇', null, '〇', '◎'], [null, '〇', '・', null, '〇']],
+                IIm7: [[null, '・', '〇', null, '・'], [null, '・', '〇', null, '◎'], [null, '・', null, '〇', null], [null, '◎', null, '・', '〇'], [null, '〇', null, '・', '〇'], [null, '・', '〇', null, '・']],
+                IIIm7: [[null, '◎', '・', null, '〇'], [null, '〇', '・', null, '〇'], [null, '〇', null, '・', null], [null, '〇', null, '◎', '・'], [null, '・', '〇', '・', '〇'], [null, '◎', '・', null, '〇']],
+                IVM7: [[null, '〇', '◎', null, '・'], [null, '・', '〇', null, '・'], [null, '・', null, '〇', null], [null, '・', null, '〇', '◎'], [null, '〇', null, '・', '〇'], [null, '〇', '◎', null, '・']],
+                V7: [[null, '・', '〇', null, '◎'], [null, '〇', '・', null, '〇'], [null, '◎', null, '・', null], [null, '〇', null, '・', '〇'], [null, '・', '〇', '・', '〇'], [null, '・', '〇', null, '◎']],
+                VIm7: [[null, '〇', '・', null, '〇'], [null, '・', '〇', null, '・'], [null, '〇', null, '◎', null], [null, '・', '〇', '・', '〇'], [null, '◎', null, '・', '〇'], [null, '〇', '・', null, '〇']],
+                VIIm7b5: [[null, '・', '〇', null, '・'], [null, '◎', '・', null, '〇'], [null, '・', null, '〇', null], [null, '〇', null, '・', '〇'], [null, '〇', null, '◎', '・'], [null, '・', '〇', null, '・']]
             }
-            if (type) {
-                currentType = type;
-                const buttons = document.querySelectorAll('#type-group .btn');
-                buttons.forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes(type)));
-                updateSelector();
-            }
-            render();
+        }
+    };
+
+    function buildFretboard() {
+        const board = document.getElementById('fretboardGrid');
+        const labels = document.getElementById('fretLabels');
+        board.innerHTML = '';
+        labels.innerHTML = '';
+
+        if (selectedChord) {
+            board.classList.add('dim-mode');
+        } else {
+            board.classList.remove('dim-mode');
         }
 
-        function updateSelector() {
-            const selector = document.getElementById('item-selector');
-            selector.innerHTML = '';
-            menus[currentType].forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.value;
-                opt.textContent = item.text;
-                selector.appendChild(opt);
-            });
+        const labelTexts = ["ポジション開始", "+1 Fret", "+2 Fret", "+3 Fret", "+4 Fret"];
+        for (let f = 0; f < 5; f++) {
+            const lbl = document.createElement('div');
+            lbl.className = 'fret-label';
+            lbl.innerText = labelTexts[f];
+            labels.appendChild(lbl);
         }
 
-        function render() {
-            const board = document.getElementById('board');
-            board.innerHTML = '';
-            
-            const selectedKey = document.getElementById('item-selector').value;
-            if (!selectedKey) return;
-            
-            const grid = data[currentPos][selectedKey];
+        const activeLayerCount = Object.values(activeLayers).filter(v => v).length;
+        const currentModel = excelModel[currentPosition];
 
-            for (let s = 0; s < 6; s++) {
-                const stringNum = 6 - s;
-                for (let f = 0; f < 6; f++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell', `string-${stringNum}`);
-                    
-                    if (f === 0) {
-                        cell.classList.add('is-nut');
-                    } else {
-                        const line = document.createElement('div');
-                        line.classList.add('fret-line');
-                        cell.appendChild(line);
-                    }
+        for (let s = 1; s <= 6; s++) {
+            const stringRow = document.createElement('div');
+            stringRow.className = 'string';
 
-                    const mark = f > 0 ? grid[s][f-1] : null;
-                    if (mark && mark !== '') {
-                        const note = document.createElement('div');
-                        note.classList.add('note');
-                        note.textContent = mark;
-                        
-                        if (mark === '◎') {
-                            note.classList.add('note-root');
-                        } else if (mark === '〇' || mark === '○' || mark === 1) {
-                            note.textContent = '〇';
-                            note.classList.add('note-chord');
-                        } else if (mark === '・' || mark === '⚪︎' || (typeof mark === 'object' && mark !== null)) {
-                            note.textContent = '・';
-                            note.classList.add('note-scale');
+            for (let f = 0; f < 5; f++) {
+                const fretCell = document.createElement('div');
+                fretCell.className = `fret fret-${f}`;
+
+                let matchingActiveScales = [];
+                for (let type in activeLayers) {
+                    if (activeLayers[type]) {
+                        const val = currentModel.scales[type][s-1][f];
+                        if (val === '〇' || val === '⚪︎' || val == 1) {
+                            matchingActiveScales.push(type);
                         }
-                        cell.appendChild(note);
                     }
-                    board.appendChild(cell);
                 }
-            }
-        }
 
-        // 初期起動
-        updateSelector();
-        render();
-    </script>
+                let isChordTone = false;
+                let isRoot = false;
+                if (selectedChord) {
+                    const cVal = currentModel.chords[selectedChord][s-1][f];
+                    if (cVal === '〇' || cVal === '◎') {
+                        isChordTone = true;
+                        if (cVal === '◎') isRoot = true;
+                    }
+                }
+
+                if (matchingActiveScales.length > 0 || isChordTone) {
+                    const noteDiv = document.createElement('div');
+                    
+                    const baseType = matchingActiveScales.length > 0 ? matchingActiveScales[0] : 'major_scale';
+                    noteDiv.className = `note ${baseType}`;
+                    noteDiv.style.display = 'flex';
+
+                    if (activeLayerCount > 1 && matchingActiveScales.length === activeLayerCount) {
+                        noteDiv.className = 'note scale-overlap';
+                    }
+
+                    if (selectedChord && isChordTone) {
+                        noteDiv.classList.add('chord-on');
+                        noteDiv.innerText = isRoot ? 'R' : '●';
+                        if (isRoot) {
+                            noteDiv.classList.add('chord-root');
+                        }
+                    }
+
+                    fretCell.appendChild(noteDiv);
+                }
+
+                stringRow.appendChild(fretCell);
+            }
+            board.appendChild(stringRow);
+        }
+    }
+
+    // 新設：ポジション切り替え関数
+    function changePosition(posName) {
+        currentPosition = posName;
+        document.querySelectorAll('.pos-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', `position${idx+1}` === posName);
+        });
+        buildFretboard();
+    }
+
+    function toggleLayer(layerName) {
+        activeLayers[layerName] = !activeLayers[layerName];
+        document.getElementById(`btn-${layerName}`).classList.toggle('active', activeLayers[layerName]);
+        buildFretboard();
+    }
+
+    function toggleChord(chordName) {
+        const buttons = document.querySelectorAll('.chord-btn');
+        if (selectedChord === chordName) {
+            selectedChord = null;
+            event.target.classList.remove('active');
+        } else {
+            buttons.forEach(b => b.classList.remove('active'));
+            selectedChord = chordName;
+            event.target.classList.add('active');
+        }
+        buildFretboard();
+    }
+
+    window.onload = buildFretboard;
+</script>
 </body>
 </html>
