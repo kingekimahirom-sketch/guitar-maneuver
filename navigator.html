@@ -3,258 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROGRESSION RADAR - Cyber Jazz Commander</title>
+    <title>GTR_MNVR / PROGRESSION</title>
     <style>
         :root {
-            --bg-color: #0d1117;
-            --panel-bg: #161b22;
-            --accent-cyan: #58a6ff;
-            --accent-green: #3fb950;
-            --accent-orange: #f0883e;
-            --text-color: #c9d1d9;
-            --text-muted: #8b949e;
+            --bg: #ffffff;
+            --text: #111111;
+            --accent: #ff3e00;
+            --border: #e5e5e5;
         }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'Helvetica Neue', sans-serif;
+            padding: 40px 10%;
+            line-height: 1.5;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        /* ヘッダー */
+        header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 80px; border-bottom: 1px solid var(--text); padding-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+        .nav-link { font-size: 14px; font-weight: 600; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--text); }
 
-        header {
-            border-bottom: 2px solid var(--accent-cyan);
-            padding-bottom: 10px;
-            margin-bottom: 25px;
-        }
+        /* コントロール */
+        .tab-group { display: flex; gap: 40px; margin-bottom: 60px; }
+        .tab-btn { background: none; border: none; font-size: 16px; font-weight: 600; color: #aaa; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { color: var(--text); border-bottom: 2px solid var(--text); }
 
-        h1 {
-            color: var(--accent-cyan);
-            margin: 0;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-        }
+        /* レーダー：コードの流れを横並びで強調 */
+        .prog-title { font-size: 32px; font-weight: 800; margin-bottom: 40px; }
+        .chord-chain { display: flex; gap: 20px; margin-bottom: 60px; }
+        .chord-box { flex: 1; padding: 20px 10px; border: 1px solid var(--border); transition: 0.3s; }
+        .chord-box:hover { border-color: var(--accent); }
+        .chord-name { font-size: 24px; font-weight: 700; }
+        .chord-deg { font-size: 12px; color: #888; margin-top: 5px; text-transform: uppercase; }
 
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
+        /* 解説 */
+        .briefing { max-width: 600px; }
+        .briefing h4 { font-size: 12px; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px; }
+        .briefing p { font-size: 18px; line-height: 1.7; }
 
-        /* 進行選択タブ */
-        .tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .tab-btn {
-            background-color: var(--panel-bg);
-            border: 1px solid #30363d;
-            color: var(--text-color);
-            padding: 12px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn:hover {
-            border-color: var(--accent-cyan);
-        }
-
-        .tab-btn.active {
-            background-color: var(--accent-cyan);
-            color: var(--bg-color);
-            border-color: var(--accent-cyan);
-        }
-
-        /* レーダーパネル（メイン表示） */
-        .radar-panel {
-            background-color: var(--panel-bg);
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .prog-title {
-            font-size: 1.4rem;
-            color: #fff;
-            margin-top: 0;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* コード表示ブロック */
-        .chord-chain {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .chord-box {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 20px 15px;
-            text-align: center;
-        }
-
-        .chord-name {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #fff;
-            margin-bottom: 5px;
-        }
-
-        .chord-deg {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-family: monospace;
-        }
-
-        /* 解説カード */
-        .analysis-box {
-            border-left: 4px solid var(--accent-orange);
-            background: rgba(240, 136, 62, 0.05);
-            padding: 15px;
-            border-radius: 0 6px 6px 0;
-        }
-
-        .analysis-box h4 {
-            margin: 0 0 8px 0;
-            color: var(--accent-orange);
-        }
-
-        .analysis-box p {
-            margin: 0;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        /* 戻るリンク */
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: var(--accent-cyan);
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        .back-link:hover {
-            text-decoration: underline;
+        @media (max-width: 768px) {
+            body { padding: 30px 20px; }
+            .chord-chain { flex-direction: column; }
+            .prog-title { font-size: 24px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
     <header>
-        <h1>HARMONIC TRAJECTORY RADAR</h1>
-        <div class="subtitle">SYSTEM VERSION 2.0 // DEGREES ONLY GRID</div>
+        <div class="logo">PROGRESSION.</div>
+        <a href="index.html" class="nav-link">BACK TO MENU</a>
     </header>
 
-    <!-- タブメニュー -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchProgression('major', event)">II - V - I - VI</button>
-        <button class="tab-btn" onclick="switchProgression('sdm', event)">IVM7 - IVm7 - III - VI</button>
-        <button class="tab-btn" onclick="switchProgression('backdoor', event)">IIm7 - ♭VII7 - IM7</button>
+    <div class="tab-group">
+        <button class="tab-btn active" onclick="switchProgression('major', event)">II-V-I-VI</button>
+        <button class="tab-btn" onclick="switchProgression('sdm', event)">SUB-DOM MINOR</button>
+        <button class="tab-btn" onclick="switchProgression('backdoor', event)">BACKDOOR</button>
     </div>
 
-    <!-- レーダーメイン表示 -->
-    <div class="radar-panel">
-        <h2 id="progTitle" class="prog-title">LOADING SYSTEM...</h2>
-
-        <!-- コード表示エリア -->
-        <div class="chord-chain" id="chordChain">
-            <!-- JSで動的に挿入されます -->
-        </div>
-
-        <!-- 司令部解説 -->
-        <div class="analysis-box">
-            <h4>TACTICAL BRIEFING (ソロギター攻略の鍵)</h4>
+    <main>
+        <div id="progTitle" class="prog-title">LOADING...</div>
+        <div class="chord-chain" id="chordChain"></div>
+        <div class="briefing">
+            <h4>TACTICAL BRIEFING</h4>
             <p id="analysisText">LOADING...</p>
         </div>
-    </div>
+    </main>
 
-    <a href="index.html" class="back-link">← メインメニューに戻る</a>
-</div>
+    <script>
+        const progressions = {
+            major: {
+                title: "Major II-V-I-VI",
+                chords: [{name:"IIm7",deg:"2nd"},{name:"V7",deg:"5th"},{name:"IM7",deg:"1st"},{name:"VI7",deg:"6th"}],
+                briefing: "ジャズの標準装備。V7の3度と7度が、IM7のルートと3度へ滑り込むガイドトーンを指板上でなぞる感覚を磨いてください。"
+            },
+            sdm: {
+                title: "Subdominant Minor",
+                chords: [{name:"IVM7",deg:"4th"},{name:"IVm7",deg:"4m"},{name:"IIIm7",deg:"3rd"},{name:"VI7",deg:"6th"}],
+                briefing: "メジャーからマイナーへの『半音降下』が鍵。切ない響きを指板のどこで鳴らすか、ポジションの選択がソロの命運を分けます。"
+            },
+            backdoor: {
+                title: "Backdoor Dominant",
+                chords: [{name:"IIm7",deg:"2nd"},{name:"♭VII7",deg:"♭7th"},{name:"IM7",deg:"1st"},{name:"IM7",deg:"1st"}],
+                briefing: "裏口からの奇襲。♭VII7が持つ独特の浮遊感を活かし、無理にドミナントで解決せず、優しくトニックへ着地させるモダンなアプローチ。"
+            }
+        };
 
-<script>
-    const progressions = {
-        major: {
-            title: "王道 MAJOR II-V-I-VI 進行",
-            chords: [
-                { name: "IIm7", deg: "2nd minor" },
-                { name: "V7", deg: "5th dominant" },
-                { name: "IM7", deg: "1st tonic" },
-                { name: "VI7", deg: "6th secondary" }
-            ],
-            briefing: "ジャズのあらゆる曲の着地に使われる超重要進行です。V7からIM7へ着地する際、V7の3度と7度が、IM7のルートと3度へ半音で滑らかに吸い込まれるライン（ガイドトーン）を、ソロギターのトップノートやインサイドボイスで意識すると、一気にジャズらしい洗練された響きになります。常に指板のCAGED各フォームでこの度数配置を追えるようにしましょう。"
-        },
-        sdm: {
-            title: "切なさを生み出す SUBDOMINANT MINOR",
-            chords: [
-                { name: "IVM7", deg: "4th major" },
-                { name: "IVm7", deg: "4th minor" },
-                { name: "IIIm7", deg: "3rd minor" },
-                { name: "VI7", deg: "6th dominant" }
-            ],
-            briefing: "現在練習中の『Just Friends』の冒頭を司る魔術的な進行です。4度メジャーから4度マイナーへ変化するときの、コードトーンの『半音降下（メジャー3度 ➔ マイナー3度）』をギター指板上で途切れさせずに滑らかに繋ぐことが、ソロギターで最も美味しい表現ポイントになります。"
-        },
-        backdoor: {
-            title: "裏口からの奇襲 BACKDOOR DOMINANT",
-            chords: [
-                { name: "IIm7", deg: "2nd minor" },
-                { name: "♭VII7", deg: "backdoor dom." },
-                { name: "IM7", deg: "1st tonic" },
-                { name: "IM7", deg: "1st tonic" }
-            ],
-            briefing: "通常のII-V-Iの『V7』の代わりに、半音上の『♭VII7』を置いてトニック（IM7）に解決する、モダンでフワッとした浮遊感のある進行です。本質的にはサブドミナントマイナー（IVm7）の代理。ルートが全音下からIM7へと滑り込む独特なベースラインの跳躍と、上部構造の整合性を脳内で同期させる訓練に最適です。"
+        function switchProgression(type, event) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(event) event.target.classList.add('active');
+            const prog = progressions[type];
+            document.getElementById('progTitle').innerText = prog.title;
+            document.getElementById('analysisText').innerText = prog.briefing;
+            document.getElementById('chordChain').innerHTML = prog.chords.map(c => `
+                <div class="chord-box">
+                    <div class="chord-name">${c.name}</div>
+                    <div class="chord-deg">${c.deg}</div>
+                </div>
+            `).join('');
         }
-    };
-
-    function switchProgression(type, event) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        
-        if (event && event.target) {
-            event.target.classList.add('active');
-        } else {
-            document.querySelector('.tabs .tab-btn').classList.add('active');
-        }
-
-        const prog = progressions[type];
-        
-        document.getElementById('progTitle').innerText = prog.title;
-        document.getElementById('analysisText').innerText = prog.briefing;
-
-        const chainContainer = document.getElementById('chordChain');
-        chainContainer.innerHTML = '';
-        
-        prog.chords.forEach(chord => {
-            const box = document.createElement('div');
-            box.className = 'chord-box';
-            box.innerHTML = `
-                <div class="chord-name">${chord.name}</div>
-                <div class="chord-deg">${chord.deg}</div>
-            `;
-            chainContainer.appendChild(box);
-        });
-    }
-
-    window.onload = function() {
         switchProgression('major');
-    };
-</script>
+    </script>
 </body>
 </html>
