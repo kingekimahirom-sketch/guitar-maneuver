@@ -3,257 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guitar Maneuver - Cyber Command</title>
+    <title>GTR_MNVR / CONTEMPORARY</title>
     <style>
         :root {
-            --color-tonic: #00f0ff;    /* ネオンシアン */
-            --color-3rd: #ff007f;      /* ネオンマゼンタ */
-            --color-5th: #39ff14;      /* ネオンライム */
-            --color-7th: #ffff00;      /* ネオンイエロー */
-            
-            --bg-cyber: #0a0a12;       /* 深い電脳の闇 */
-            --panel-bg: #121224;       /* コックピットパネル */
-            --text-main: #e2e8f0;      /* サイバーホワイト */
-            --text-sub: #475569;
-            --border-neon: rgba(0, 240, 255, 0.12);
+            --bg: #ffffff;
+            --fg: #000000;
+            --accent: #ff3e00; /* 鮮烈なオレンジ */
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background-color: var(--bg-cyber);
-            color: var(--text-main);
-            font-family: 'Consolas', 'Courier New', monospace, sans-serif;
-            padding: 40px 20px;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             min-height: 100vh;
-        }
-
-        .container { max-width: 600px; margin: 0 auto; }
-
-        header {
-            text-align: center;
-            padding-bottom: 25px;
-            border-bottom: 1px solid var(--border-neon);
-            margin-bottom: 35px;
-            position: relative;
-        }
-        header h1 {
-            font-size: 34px;
-            font-weight: 900;
-            letter-spacing: 8px;
-            color: #fff;
-            text-shadow: 0 0 10px var(--color-tonic), 0 0 20px rgba(0, 240, 255, 0.5);
-        }
-        header p {
-            font-size: 11px;
-            color: var(--color-tonic);
-            opacity: 0.8;
-            letter-spacing: 4px;
-            margin-top: 6px;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            padding: 5vw;
             text-transform: uppercase;
         }
-        .system-clock {
-            font-size: 11px;
-            color: #008b9b;
-            letter-spacing: 2px;
-            margin-top: 12px;
-            font-weight: bold;
-        }
-        
-        .cyber-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-neon);
-            border-radius: 4px;
-            padding: 30px 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.03);
-            position: relative;
-            overflow: hidden;
-        }
-        .cyber-card::before {
-            content: "DAILY TARGET";
-            position: absolute;
-            top: 0; left: 0;
-            background: rgba(255, 0, 127, 0.15);
-            color: var(--color-3rd);
-            font-size: 9px;
-            padding: 2px 8px;
-            letter-spacing: 1px;
-            border-bottom-right-radius: 4px;
-            border-right: 1px solid rgba(255, 0, 127, 0.3);
-        }
-        .target-box { text-align: center; padding-top: 10px; }
-        .target-title {
-            font-size: 30px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 10px;
-            text-shadow: 0 0 12px var(--color-3rd);
-            letter-spacing: 1px;
-        }
-        .target-meta { 
-            font-size: 12px; 
-            color: var(--color-tonic); 
-            letter-spacing: 1px;
-            background: rgba(0, 240, 255, 0.05);
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 2px;
-        }
 
-        /* 戦術ナビゲーション（色分けリスト） */
-        .menu-list { display: flex; flex-direction: column; gap: 16px; }
-        
+        /* ヘッダー：情報の断片化 */
+        header { display: flex; justify-content: space-between; align-items: flex-end; }
+        h1 { font-size: 8vw; font-weight: 900; line-height: 0.8; letter-spacing: -0.05em; }
+        .system-clock { font-size: 10px; font-weight: 500; transform: rotate(-90deg); transform-origin: bottom right; }
+
+        /* メインターゲット：空間を大胆に使う */
+        main { display: flex; flex-direction: column; justify-content: center; }
+        .target-title { font-size: 6vw; font-weight: 200; border-bottom: 2px solid var(--fg); padding-bottom: 20px; }
+        .target-meta { font-size: 2vw; margin-top: 10px; color: #666; }
+
+        /* メニュー：反復と配置の美学 */
+        .menu-list { display: flex; flex-direction: column; gap: 40px; margin-top: 100px; }
         .menu-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(18, 18, 36, 0.7); padding: 20px 24px; border-radius: 4px;
-            text-decoration: none; color: #fff; font-weight: bold;
-            transition: all 0.2s ease; position: relative;
+            text-decoration: none;
+            color: var(--fg);
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
-        .menu-item::before {
-            content: ""; position: absolute; left: 0; top: 0; width: 4px; height: 100%;
-        }
+        .menu-item:hover { color: var(--accent); }
+        .menu-num { font-size: 12px; font-weight: bold; }
+        .menu-title { font-size: 3vw; font-weight: 700; }
 
-        /* ① コード進行：シアン仕様 */
-        .item-progression { border: 1px solid rgba(0, 240, 255, 0.2); }
-        .item-progression::before { background: var(--color-tonic); }
-        .item-progression .menu-title { color: #fff; }
-        .item-progression .menu-icon { border-left: 7px solid var(--color-tonic); }
-        .item-progression:hover {
-            transform: translateX(4px);
-            border-color: var(--color-tonic);
-            background: rgba(0, 240, 255, 0.04);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-        }
-
-        /* ② スケール：ライム仕様 */
-        .item-scale { border: 1px solid rgba(57, 255, 20, 0.2); }
-        .item-scale::before { background: var(--color-5th); }
-        .item-scale .menu-title { color: #fff; }
-        .item-scale .menu-icon { border-left: 7px solid var(--color-5th); }
-        .item-scale:hover {
-            transform: translateX(4px);
-            border-color: var(--color-5th);
-            background: rgba(57, 255, 20, 0.04);
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.15);
-        }
-
-        /* ③ リック：マゼンタ仕様 */
-        .item-licks { border: 1px solid rgba(255, 0, 127, 0.2); }
-        .item-licks::before { background: var(--color-3rd); }
-        .item-licks .menu-title { color: #fff; }
-        .item-licks .menu-icon { border-left: 7px solid var(--color-3rd); }
-        .item-licks:hover {
-            transform: translateX(4px);
-            border-color: var(--color-3rd);
-            background: rgba(255, 0, 127, 0.04);
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.15);
-        }
-
-        .menu-title {
-            font-size: 14px;
-            letter-spacing: 2px;
-        }
-        .menu-desc {
-            font-size: 11px;
-            color: var(--text-sub);
-            margin-left: 15px;
-            font-weight: normal;
-        }
-        .menu-icon {
-            width: 0; height: 0; 
-            border-top: 5px solid transparent; border-bottom: 5px solid transparent; 
+        @media (max-width: 768px) {
+            h1 { font-size: 15vw; }
+            .target-title { font-size: 10vw; }
+            .menu-title { font-size: 8vw; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>GUITAR MANEUVER</h1>
-            <p>SYSTEM PROTOCOL v2.06</p>
-            <div class="system-clock" id="liveClock">CLOCK INITIALIZING...</div>
-        </header>
 
-        <!-- 今日のターゲット表示 -->
-        <div class="cyber-card">
-            <div class="target-box">
-                <div class="target-title" id="dailySong">LOADING SYSTEM...</div>
-                <div class="target-meta" id="dailyMeta">SCANNING BIBLE DATA...</div>
-            </div>
-        </div>
+    <header>
+        <h1>GTR<br>MNVR</h1>
+        <div class="system-clock" id="liveClock">INIT...</div>
+    </header>
 
-        <!-- 3つのカラーリフレクションメニュー -->
-        <div class="menu-list">
-            <!-- ① コード進行 (シアン) -->
-            <a href="navigator.html" class="menu-item item-progression">
-                <div>
-                    <span class="menu-title">PROGRESSION RADAR</span>
-                    <span class="menu-desc">// コード進行・度数配置</span>
-                </div>
-                <div class="menu-icon"></div>
-            </a>
-            
-            <!-- ② スケール (ライム) -->
-            <a href="scale.html" class="menu-item item-scale">
-                <div>
-                    <span class="menu-title">SCALE ANALYSIS</span>
-                    <span class="menu-desc">// 各種スケール・アルペジオ</span>
-                </div>
-                <div class="menu-icon"></div>
-            </a>
-            
-            <!-- ③ リック (マゼンタ) -->
-            <a href="licks.html" class="menu-item item-licks">
-                <div>
-                    <span class="menu-title">TACTICAL LICKS</span>
-                    <span class="menu-desc">// 実戦常套句・アプローチ</span>
-                </div>
-                <div class="menu-icon"></div>
-            </a>
-        </div>
+    <main>
+        <div id="dailySong" class="target-title">LOADING...</div>
+        <div id="dailyMeta" class="target-meta">---</div>
+    </main>
+
+    <div class="menu-list">
+        <a href="navigator.html" class="menu-item"><span class="menu-num">01</span><span class="menu-title">PROGRESSION</span></a>
+        <a href="scale.html" class="menu-item"><span class="menu-num">02</span><span class="menu-title">SCALE</span></a>
+        <a href="licks.html" class="menu-item"><span class="menu-num">03</span><span class="menu-title">TACTICAL</span></a>
     </div>
 
     <script>
         const realBookStandards = [
-            { title: "Just Friends", source: "Bible 1", key: "G Major" },
-            { title: "Someday My Prince Will Come", source: "Bible 1", key: "Bb Major" },
-            { title: "All The Things You Are", source: "Bible 1", key: "Ab Major" },
-            { title: "Autumn Leaves", source: "Bible 1", key: "G Minor" },
-            { title: "There Will Never Be Another You", source: "Bible 1", key: "Eb Major" },
-            { title: "Stella by Starlight", source: "Bible 1", key: "Bb Major" },
-            { title: "Fly Me to the Moon", source: "Bible 1", key: "C Minor" },
-            { title: "You'd Be So Nice To Come Home To", source: "Bible 1", key: "G Minor" },
-            { title: "Confirmation", source: "Bible 1", key: "F Major" },
-            { title: "Wave", source: "Bible 1", key: "D Major" },
-            { title: "On Green Dolphin Street", source: "Bible 2", key: "C Major" },
-            { title: "Beautiful Love", source: "Bible 2", key: "D Minor" },
-            { title: "Alice In Wonderland", source: "Bible 2", key: "G Major" },
-            { title: "Days Of Wine And Roses", source: "Bible 1", key: "F Major" },
-            { title: "Black Orpheus", source: "Bible 1", key: "A Minor" }
+            { title: "Just Friends", source: "BIBLE 01", key: "G MAJOR" },
+            { title: "Someday My Prince Will Come", source: "BIBLE 01", key: "Bb MAJOR" },
+            { title: "All The Things You Are", source: "BIBLE 01", key: "Ab MAJOR" },
+            { title: "Autumn Leaves", source: "BIBLE 01", key: "G MINOR" },
+            { title: "Stella by Starlight", source: "BIBLE 01", key: "Bb MAJOR" },
+            { title: "Fly Me to the Moon", source: "BIBLE 01", key: "C MINOR" },
+            { title: "Confirmation", source: "BIBLE 01", key: "F MAJOR" },
+            { title: "Wave", source: "BIBLE 01", key: "D MAJOR" },
+            { title: "On Green Dolphin Street", source: "BIBLE 02", key: "C MAJOR" },
+            { title: "Beautiful Love", source: "BIBLE 02", key: "D MINOR" },
+            { title: "Alice In Wonderland", source: "BIBLE 02", key: "G MAJOR" },
+            { title: "Black Orpheus", source: "BIBLE 01", key: "A MINOR" }
         ];
 
         function updateClock() {
-            const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-            const hh = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-            const ss = String(now.getSeconds()).padStart(2, '0');
-            const ms = String(now.getMilliseconds()).padStart(3, '0');
-            
-            document.getElementById("liveClock").innerText = 
-                `SYS_TIME // ${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}.${ms}`;
+            const n = new Date();
+            document.getElementById("liveClock").innerText = `${n.getHours()}:${n.getMinutes()}:${n.getSeconds()}`;
         }
-        setInterval(updateClock, 1);
+        setInterval(updateClock, 1000);
 
-        window.onload = function() {
+        window.onload = () => {
             updateClock();
-            const today = new Date();
-            const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+            const seed = new Date().getDate();
             const target = realBookStandards[seed % realBookStandards.length];
-            
             document.getElementById("dailySong").innerText = target.title;
-            document.getElementById("dailyMeta").innerText = `${target.source} // KEY: ${target.key}`;
+            document.getElementById("dailyMeta").innerText = `${target.source} / KEY: ${target.key}`;
         };
     </script>
 </body>
