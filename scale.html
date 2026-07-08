@@ -104,121 +104,44 @@
     let activeLayers = { major_scale: true, melodic_minor: false, major_penta: false, minor_penta: false };
     let selectedChord = null;
 
-    const excelModel = { /* (データ構造保持) */
-        position1: { scales: { major_scale: [
-            ['〇', null, '〇', null, '〇'], 
-            [null, null, '〇', null, '〇'], 
-            [null, '〇', '〇', null, '〇'], 
-            [null, '〇', '〇', null, '〇'], 
-            ['〇', null, '〇', null, '〇'], 
-            ['〇', null, '〇', null, '〇']], 
-                              melodic_minor: [
-                                  ['〇', null, '〇','〇', null], 
-                                  [null, null, '〇', null, '〇'], 
-                                  ['〇', null, '〇', null, '〇'], 
-                                  [ null, '〇', '〇', null, '〇'], 
-                                  ['〇', null, '〇', null, '〇'], 
-                                  ['〇', null, '〇','〇', null]], 
-                              major_penta: [
-                                  ['〇', null, '〇', null, '〇'], 
-                                  [null, null, '〇', null, '・'], 
-                                  [null, '〇', '・', null, '〇'], 
-                                  [null, '・', '〇', null, '〇'], 
-                                  ['・', null, '〇', null, '〇'], 
-                                  ['〇', null, '〇', null, '〇']], 
-                              minor_penta: [
-                                  ['〇', null, '・', '〇', '・'], 
-                                  ['〇', null, '・', '〇', '・'], 
-                                  ['〇', '・', '〇', null, '・'], 
-                                  ['〇', '・', '〇', null, '・'], 
-                                  ['〇', null, '〇', null, '・'], 
-                                  ['〇', null, '・', '〇', '・']] }, chords: { IM7: [['◎', null, '・', null, '〇'], [null, null, '・', null, '〇'], [null, '〇', '・', null, '〇'], [null, '〇', '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇']], IIm7: [['〇', null, '◎', null, '・'], [null, null, '〇', null, '・'], [null, '・', '〇', null, '----'], [null, '・', '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・']], IIIm7: [['・', null, '〇', null, '◎'], [null, null, '・', null, '〇'], [null, '◎', '・', null, '〇'], [null, '〇', '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎']], IVM7: [['〇', null, '・', null, '〇'], [null, null, '〇', null, '・'], [null, '〇', '◎', null, '・'], [null, '・', '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇']], V7: [['・', null, '〇', null, '・'], [null, null, '・', null, '〇'], [null, '・', '〇', null, '◎'], [null, '〇', '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・']], VIm7: [['〇', null, '・', null, '〇'], [null, null, '◎', null, '・'], [null, '〇', '・', null, '〇'], [null, '・', '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇']], VIIm7b5: [['・', null, '〇', null, '・'], [null, null, '〇', null, '◎'], [null, '・', '〇', null, '・'], [null, '◎', '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・']] } },
-        position2: { scales: { major_scale: [
-            ['〇', null, '〇', null, '〇'], 
-            [null, null, '〇', '〇', null], 
-            [null, '〇', '〇', null, '〇'], 
-            ['〇', null, '〇', null, '〇'], 
-            ['〇', null, '〇', null, '〇'], 
-            ['〇', null, '〇', null, '〇']], 
-                              melodic_minor: [
-                                  ['〇', null, '〇', null, '〇'], 
-                                  [null,'〇', null, '〇', null], 
-                                  [null, '〇', '〇', null, '〇'], 
-                                  ['〇', null, '〇', null, '〇'], 
-                                  ['〇', null, '〇','〇', null], 
-                                  ['〇', null, '〇', null, '〇']], 
-                              major_penta: [
-                                  ['〇', null, '〇', null, '・'], 
-                                  [null, null, '〇', '・', null], 
-                                  [null, '・', '〇', null, '〇'], 
-                                  ['・', null, '〇', null, '〇'], 
-                                  ['〇', null, '〇', null, '〇'], 
-                                  ['〇', null, '〇', null, '・']], 
-                              minor_penta: [
-                                  ['〇', null, '・', '〇', '・'], 
-                                  [null, '〇', '・', '〇', null], 
-                                  ['〇', '・', '〇', null, '・'], 
-                                  ['〇', null, '〇', null, '・'], 
-                                  ['〇', null, '・', '〇', '・'], 
-                                  ['〇', null, '・', '〇', '・']] }, chords: { IM7: [['〇', null, '・', null, '〇'], [null, null, '〇', '・', null], [null, '〇', '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇']], IIm7: [['・', null, '〇', null, '・'], [null, null, '・', '〇', null], [null, '・', '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・']], IIIm7: [['〇', null, '・', null, '〇'], [null, null, '◎', '・', null], [null, '〇', '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇']], IVM7: [['・', null, '〇', null, '・'], [null, null, '〇', '◎', null], [null, '・', '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・']], V7: [['◎', null, '・', null, '〇'], [null, null, '・', '〇', null], [null, '〇', '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇']], VIm7: [['〇', null, '◎', null, '・'], [null, null, '〇', '・', null], [null, '・', '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・']], VIIm7b5: [['・', null, '〇', null, '◎'], [null, null, '・', '〇', null], [null, '◎', '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎']] } },
-        position3: { scales: { major_scale: [
-            [null, '〇', null, '〇', '〇'], 
-            [null, '〇', '〇', null, '〇'], 
-            ['〇', '〇', null, '〇', null], 
-            [null, '〇', null, '〇', null], 
-            [null, '〇', null, '〇', '〇'], 
-            [null, '〇', null, '〇', '〇']], 
-                              melodic_minor: [
-                                  [null, '〇', null, '〇', '〇'], 
-                                  ['〇', null, '〇', null, '〇'], 
-                                  ['〇', '〇', null, '〇', null], 
-                                  [null, '〇', null, '〇', null], 
-                                  [null, '〇','〇', null, '〇'], 
-                                  [null, '〇', null, '〇', '〇']], 
-                              major_penta: [
-                                  [null, '〇', null, '・', '〇'], 
-                                  [null, '〇', '・', null, '〇'], 
-                                  ['・', '〇', null, '〇', null], 
-                                  [null, '〇', null, '〇', null], 
-                                  [null, '〇', null, '〇', '・'], 
-                                  [ null, '〇', null, '・', '〇']], 
-                              minor_penta: [
-                                  [null, '・', '〇', '・', '〇'], 
-                                  [null, '・', '〇', null,'〇'], 
-                                  ['・', '〇', null, null,'〇'], 
-                                  [null, '〇', null, '・', '〇'], 
-                                  [null, '・', '〇', '・', '〇'], 
-                                  [null, '・', '〇', '・', '〇']] }, chords: { IM7: [[null, '・', null, '〇', '◎'], [null, '〇', '・', null, '〇'], ['〇', '◎', null, '・', null], [null, '〇', null, '・', null], [null, '・', null, '〇', '・'], [null, '・', null, '〇', '◎']], IIm7: [[null, '〇', null, '・', '〇'], [null, '・', '〇', null, '・'], ['・', '〇', null, '◎', null], [null, '・', null, '〇', null], [null, '◎', null, '・', '〇'], [null, '〇', null, '・', '〇']], IIIm7: [[null, '・', null, '〇', '・'], [null, '◎', '・', null, '〇'], ['〇', '・', null, '〇', null], [null, '〇', null, '・', null], [null, '〇', null, '◎', '・'], [null, '・', null, '〇', '・']], IVM7: [[null, '〇', null, '・', '〇'], [null, '〇', '◎', null, '・'], ['・', '〇', null, '・', null], [null, '・', null, '〇', null], [null, '・', null, '〇', '◎'], [null, '〇', null, '・', '〇']], V7: [[null, '・', null, '〇', '・'], [null, '・', '〇', null, '◎'], ['〇', '・', null, '〇', null], [null, '◎', null, '・', null], [null, '〇', null, '・', '〇'], [null, '・', null, '〇', '・']], VIm7: [[null, '◎', null, '・', '〇'], [null, '〇', '・', null, '〇'], ['・', '〇', null, '・', null], [null, '〇', null, '◎', null], [null, '・', null, '〇', '・'], [null, '◎', null, '・', '〇']], VIIm7b5: [[null, '〇', null, '◎', '・'], [null, '・', '〇', null, '・'], ['◎', '・', null, '〇', null], [null, '・', null, '〇', null], [null, '〇', null, '・', '〇'], [null, '〇', null, '◎', '・']] } },
-        position4: { scales: { major_scale: [
-            [null, '〇', '〇', null, '〇'], 
-            [null, '〇', '〇', null, '〇'], 
-            [null, '〇', null, '〇', null], 
-            [null, '〇', null, '〇', '〇'], 
-            [null, '〇', null, '〇', '〇'], 
-            [null, '〇', '〇', null, '〇']], 
-                              melodic_minor: [
-                                  ['〇', null, '〇', null, '〇'], 
-                                  [null, '〇', '〇', null, '〇'], 
-                                  [null, '〇', null, '〇', null], 
-                                  [null, '〇', '〇', null, '〇'], 
-                                  [null, '〇', null, '〇', '〇'], 
-                                  ['〇', null', '〇', null, '〇']], 
-                              major_penta: [
-                                  [null, '〇', '・', null, '〇'], 
-                                  [null, '・', '〇', null, '〇'], 
-                                  [null, '〇', null, '〇', null], 
-                                  [null, '〇', null, '〇', '・'], 
-                                  [null, '〇', null, '・', '〇'], 
-                                  [null, '〇', '・', null, '〇']], 
-                              minor_penta: [
-                                  ['〇', '・', '〇', null,'〇'], 
-                                  [null, '・', '〇', null, null], 
-                                  [null, '〇', null, '・', '〇'], 
-                                  [null, '・', '〇', '・', '〇'], 
-                                  [null, '・', '〇', '・', '〇'], 
-                                  ['〇', '・', '〇', null, '〇']] }, chords: { IM7: [[null, '〇', '・', null, '〇'], [null, '〇', '◎', null, '・'], [null, '〇', null, '・', null], [null, '・', null, '〇', '・'], [null, '〇', null, '〇', '◎'], [null, '〇', '・', null, '〇']], IIm7: [[null, '・', '〇', null, '・'], [null, '・', '〇', null, '◎'], [null, '・', null, '〇', null], [null, '◎', null, '・', '〇'], [null, '〇', null, '・', '〇'], [null, '・', '〇', null, '・']], IIIm7: [[null, '◎', '・', null, '〇'], [null, '〇', '・', null, '〇'], [null, '〇', null, '・', null], [null, '〇', null, '◎', '・'], [null, '・', '〇', '・', '〇'], [null, '◎', '・', null, '〇']], IVM7: [[null, '〇', '◎', null, '・'], [null, '・', '〇', null, '・'], [null, '・', null, '〇', null], [null, '・', null, '〇', '◎'], [null, '〇', null, '・', '〇'], [null, '〇', '◎', null, '・']], V7: [[null, '・', '〇', null, '◎'], [null, '〇', '・', null, '〇'], [null, '◎', null, '・', null], [null, '〇', null, '・', '〇'], [null, '・', '〇', '・', '〇'], [null, '・', '〇', null, '◎']], VIm7: [[null, '〇', '・', null, '〇'], [null, '・', '〇', null, '・'], [null, '〇', null, '◎', null], [null, '・', '〇', '・', '〇'], [null, '◎', null, '・', '〇'], [null, '〇', '・', null, '〇']], VIIm7b5: [[null, '・', '〇', null, '・'], [null, '◎', '・', null, '〇'], [null, '・', null, '〇', null], [null, '〇', null, '・', '〇'], [null, '〇', null, '◎', '・'], [null, '・', '〇', null, '・']] } }
+    const excelModel = {
+        position1: {
+            scales: {
+                major_scale: [['〇', null, '〇', null, '〇'], [null, null, '〇', null, '〇'], [null, '〇', '〇', null, '〇'], [null, '〇', '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', null, '〇']],
+                melodic_minor: [['〇', null, '〇', '〇', null], [null, null, '〇', null, '〇'], ['〇', null, '〇', null, '〇'], [null, '〇', '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', '〇', null]],
+                major_penta: [['〇', null, '〇', null, '〇'], [null, null, '〇', null, '・'], [null, '〇', '・', null, '〇'], [null, '・', '〇', null, '〇'], ['・', null, '〇', null, '〇'], ['〇', null, '〇', null, '〇']],
+                minor_penta: [['〇', null, '・', '〇', '・'], ['〇', null, '・', '〇', '・'], ['〇', '・', '〇', null, '・'], ['〇', '・', '〇', null, '・'], ['〇', null, '〇', null, '・'], ['〇', null, '・', '〇', '・']]
+            },
+            chords: { IM7: [['◎', null, '・', null, '〇'], [null, null, '・', null, '〇'], [null, '〇', '・', null, '〇'], [null, '〇', '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇']], IIm7: [['〇', null, '◎', null, '・'], [null, null, '〇', null, '・'], [null, '・', '〇', null, null], [null, '・', '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・']], IIIm7: [['・', null, '〇', null, '◎'], [null, null, '・', null, '〇'], [null, '◎', '・', null, '〇'], [null, '〇', '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎']], IVM7: [['〇', null, '・', null, '〇'], [null, null, '〇', null, '・'], [null, '〇', '◎', null, '・'], [null, '・', '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇']], V7: [['・', null, '〇', null, '・'], [null, null, '・', null, '〇'], [null, '・', '〇', null, '◎'], [null, '〇', '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・']], VIm7: [['〇', null, '・', null, '〇'], [null, null, '◎', null, '・'], [null, '〇', '・', null, '〇'], [null, '・', '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇']], VIIm7b5: [['・', null, '〇', null, '・'], [null, null, '〇', null, '◎'], [null, '・', '〇', null, '・'], [null, '◎', '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・']] }
+        },
+        position2: {
+            scales: {
+                major_scale: [['〇', null, '〇', null, '〇'], [null, null, '〇', '〇', null], [null, '〇', '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', null, '〇']],
+                melodic_minor: [['〇', null, '〇', null, '〇'], [null, '〇', null, '〇', null], [null, '〇', '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', '〇', null], ['〇', null, '〇', null, '〇']],
+                major_penta: [['〇', null, '〇', null, '・'], [null, null, '〇', '・', null], [null, '・', '〇', null, '〇'], ['・', null, '〇', null, '〇'], ['〇', null, '〇', null, '〇'], ['〇', null, '〇', null, '・']],
+                minor_penta: [['〇', null, '・', '〇', '・'], [null, '〇', '・', '〇', null], ['〇', '・', '〇', null, '・'], ['〇', null, '〇', null, '・'], ['〇', null, '・', '〇', '・'], ['〇', null, '・', '〇', '・']]
+            },
+            chords: { IM7: [['〇', null, '・', null, '〇'], [null, null, '〇', '・', null], [null, '〇', '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇']], IIm7: [['・', null, '〇', null, '・'], [null, null, '・', '〇', null], [null, '・', '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・']], IIIm7: [['〇', null, '・', null, '〇'], [null, null, '◎', '・', null], [null, '〇', '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇']], IVM7: [['・', null, '〇', null, '・'], [null, null, '〇', '◎', null], [null, '・', '〇', null, '・'], ['◎', null, '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・']], V7: [['◎', null, '・', null, '〇'], [null, null, '・', '〇', null], [null, '〇', '・', null, '〇'], ['〇', null, '◎', null, '・'], ['・', null, '〇', null, '・'], ['◎', null, '・', null, '〇']], VIm7: [['〇', null, '◎', null, '・'], [null, null, '〇', '・', null], [null, '・', '〇', null, '・'], ['・', null, '〇', null, '◎'], ['〇', null, '・', null, '〇'], ['〇', null, '◎', null, '・']], VIIm7b5: [['・', null, '〇', null, '◎'], [null, null, '・', '〇', null], [null, '◎', '・', null, '〇'], ['〇', null, '・', null, '〇'], ['・', null, '〇', null, '・'], ['・', null, '〇', null, '◎']] }
+        },
+        position3: {
+            scales: {
+                major_scale: [[null, '〇', null, '〇', '〇'], [null, '〇', '〇', null, '〇'], ['〇', '〇', null, '〇', null], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '〇'], [null, '〇', null, '〇', '〇']],
+                melodic_minor: [[null, '〇', null, '〇', '〇'], ['〇', null, '〇', null, '〇'], ['〇', '〇', null, '〇', null], [null, '〇', null, '〇', null], [null, '〇', '〇', null, '〇'], [null, '〇', null, '〇', '〇']],
+                major_penta: [[null, '〇', null, '・', '〇'], [null, '〇', '・', null, '〇'], ['・', '〇', null, '〇', null], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '・'], [null, '〇', null, '・', '〇']],
+                minor_penta: [[null, '・', '〇', '・', '〇'], [null, '・', '〇', null, '〇'], ['・', '〇', null, null, '〇'], [null, '〇', null, '・', '〇'], [null, '・', '〇', '・', '〇'], [null, '・', '〇', '・', '〇']]
+            },
+            chords: { IM7: [[null, '・', null, '〇', '◎'], [null, '〇', '・', null, '〇'], ['〇', '◎', null, '・', null], [null, '〇', null, '・', null], [null, '・', null, '〇', '・'], [null, '・', null, '〇', '◎']], IIm7: [[null, '〇', null, '・', '〇'], [null, '・', '〇', null, '・'], ['・', '〇', null, '◎', null], [null, '・', null, '〇', null], [null, '◎', null, '・', '〇'], [null, '〇', null, '・', '〇']], IIIm7: [[null, '・', null, '〇', '・'], [null, '◎', '・', null, '〇'], ['〇', '・', null, '〇', null], [null, '〇', null, '・', null], [null, '〇', null, '◎', '・'], [null, '・', null, '〇', '・']], IVM7: [[null, '〇', null, '・', '〇'], [null, '〇', '◎', null, '・'], ['・', '〇', null, '・', null], [null, '・', null, '〇', null], [null, '・', null, '〇', '◎'], [null, '〇', null, '・', '〇']], V7: [[null, '・', null, '〇', '・'], [null, '・', '〇', null, '◎'], ['〇', '・', null, '〇', null], [null, '◎', null, '・', null], [null, '〇', null, '・', '〇'], [null, '・', null, '〇', '・']], VIm7: [[null, '◎', null, '・', '〇'], [null, '〇', '・', null, '〇'], ['・', '〇', null, '・', null], [null, '〇', null, '◎', null], [null, '・', null, '〇', '・'], [null, '◎', null, '・', '〇']], VIIm7b5: [[null, '〇', null, '◎', '・'], [null, '・', '〇', null, '・'], ['◎', '・', null, '〇', null], [null, '・', null, '〇', null], [null, '〇', null, '・', '〇'], [null, '〇', null, '◎', '・']] }
+        },
+        position4: {
+            scales: {
+                major_scale: [[null, '〇', '〇', null, '〇'], [null, '〇', '〇', null, '〇'], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '〇'], [null, '〇', null, '〇', '〇'], [null, '〇', '〇', null, '〇']],
+                melodic_minor: [['〇', null, '〇', null, '〇'], [null, '〇', '〇', null, '〇'], [null, '〇', null, '〇', null], [null, '〇', '〇', null, '〇'], [null, '〇', null, '〇', '〇'], ['〇', null, '〇', null, '〇']],
+                major_penta: [[null, '〇', '・', null, '〇'], [null, '・', '〇', null, '〇'], [null, '〇', null, '〇', null], [null, '〇', null, '〇', '・'], [null, '〇', null, '・', '〇'], [null, '〇', '・', null, '〇']],
+                minor_penta: [['〇', '・', '〇', null, '〇'], [null, '・', '〇', null, null], [null, '〇', null, '・', '〇'], [null, '・', '〇', '・', '〇'], [null, '・', '〇', '・', '〇'], ['〇', '・', '〇', null, '〇']]
+            },
+            chords: { IM7: [[null, '〇', '・', null, '〇'], [null, '〇', '◎', null, '・'], [null, '〇', null, '・', null], [null, '・', null, '〇', '・'], [null, '〇', null, '〇', '◎'], [null, '〇', '・', null, '〇']], IIm7: [[null, '・', '〇', null, '・'], [null, '・', '〇', null, '◎'], [null, '・', null, '〇', null], [null, '◎', null, '・', '〇'], [null, '〇', null, '・', '〇'], [null, '・', '〇', null, '・']], IIIm7: [[null, '◎', '・', null, '〇'], [null, '〇', '・', null, '〇'], [null, '〇', null, '・', null], [null, '〇', null, '◎', '・'], [null, '・', '〇', '・', '〇'], [null, '◎', '・', null, '〇']], IVM7: [[null, '〇', '◎', null, '・'], [null, '・', '〇', null, '・'], [null, '・', null, '〇', null], [null, '・', null, '〇', '◎'], [null, '〇', null, '・', '〇'], [null, '〇', '◎', null, '・']], V7: [[null, '・', '〇', null, '◎'], [null, '〇', '・', null, '〇'], [null, '◎', null, '・', null], [null, '〇', null, '・', '〇'], [null, '・', '〇', '・', '〇'], [null, '・', '〇', null, '◎']], VIm7: [[null, '〇', '・', null, '〇'], [null, '・', '〇', null, '・'], [null, '〇', null, '◎', null], [null, '・', '〇', '・', '〇'], [null, '◎', null, '・', '〇'], [null, '〇', '・', null, '〇']], VIIm7b5: [[null, '・', '〇', null, '・'], [null, '◎', '・', null, '〇'], [null, '・', null, '〇', null], [null, '〇', null, '・', '〇'], [null, '〇', null, '◎', '・'], [null, '・', '〇', null, '・']] }
+        }
     };
-
     function updateClock() { const n = new Date(); document.getElementById("liveClock").innerText = `${n.getHours()}:${n.getMinutes()}:${n.getSeconds()}`; }
     setInterval(updateClock, 1000);
 
