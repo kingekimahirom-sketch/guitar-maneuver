@@ -23,7 +23,22 @@
         body { background: var(--bg); color: var(--fg); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; min-height: 100vh; padding: 5vw; text-transform: uppercase; }
 
         header { border-bottom: 2px solid var(--fg); padding-bottom: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
-        h1 { font-size: 5vw; font-weight: 900; line-height: 0.8; letter-spacing: -0.05em; }
+        
+        /* リンク用のロゴスタイル（元のh1のスタイルを継承しつつリンク装飾を削除） */
+        .logo { 
+            font-size: 5vw; 
+            font-weight: 900; 
+            line-height: 0.8; 
+            letter-spacing: -0.05em; 
+            text-decoration: none; 
+            color: var(--fg);
+            transition: opacity 0.2s;
+        }
+        /* ホバーエフェクト */
+        .logo:hover {
+            opacity: 0.5;
+        }
+
         .system-clock { font-size: 10px; font-weight: 500; transform: rotate(-90deg); transform-origin: bottom right; }
 
         .container { max-width: 900px; margin: 0 auto; }
@@ -58,7 +73,8 @@
 <body>
 
     <header>
-        <h1>FRETBOARD<br>VISUALIZER</h1>
+        <!-- h1タグをaタグに変更し、メインメニューへのリンク機能を追加 -->
+        <a href="index.html" class="logo">FRETBOARD<br>VISUALIZER</a>
         <div class="system-clock" id="liveClock">INIT...</div>
     </header>
 
