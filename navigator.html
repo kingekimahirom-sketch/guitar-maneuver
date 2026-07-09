@@ -10,6 +10,8 @@
             --fg: #000000;
             --accent: #ff3e00; /* 鮮烈なオレンジ */
             --border: #000000;
+            --gray-light: #f5f5f5;
+            --gray-muted: #888888;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -19,127 +21,195 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 5vw;
-            text-transform: uppercase;
+            padding: 4vw;
+            text-transform: uppercase; /* 全体を大文字ベースに */
         }
 
-        /* ヘッダー：他ページと完全に同期 */
+        /* ヘッダー */
         header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-start; 
             width: 100%;
+            margin-bottom: 60px;
         }
-        
-        /* 1つ前のページと同じく、ロゴ自体をメニューへの戻りリンクに */
         .logo { 
-            font-size: 5vw; 
+            font-size: 3.5vw; 
             font-weight: 900; 
-            line-height: 0.9; 
+            line-height: 0.85; 
             letter-spacing: -0.05em; 
             text-decoration: none;
             color: var(--fg);
+            display: inline-block;
             transition: opacity 0.2s;
         }
-        .logo:hover { 
-            opacity: 0.5; 
-        }
+        .logo:hover { opacity: 0.5; }
 
         /* メインコンテンツ */
         main { 
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            align-content: start;
         }
 
-        /* コントロール（タブ） */
+        @media (min-width: 992px) {
+            main {
+                grid-template-columns: 350px 1fr;
+                column-gap: 80px;
+                align-items: start;
+            }
+        }
+
+        /* 左エリア */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
         .tab-group { 
             display: flex; 
-            gap: 30px; 
+            flex-direction: row;
+            gap: 20px; 
             margin-bottom: 40px; 
-            border-bottom: 2px solid var(--fg);
+            border-bottom: 1px solid var(--fg);
             padding-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        @media (min-width: 992px) {
+            .tab-group {
+                flex-direction: column;
+                border-bottom: none;
+                border-left: 2px solid #eee;
+                padding-bottom: 0;
+                padding-left: 20px;
+                gap: 15px;
+            }
         }
         .tab-btn { 
             background: none; 
             border: none; 
-            font-size: 14px; 
+            font-size: 13px; 
             font-weight: 900; 
-            color: #666; 
+            color: var(--gray-muted); 
             cursor: pointer; 
-            letter-spacing: 0.05em;
-            transition: color 0.2s; 
+            letter-spacing: 0.08em;
+            transition: all 0.2s; 
             text-transform: uppercase;
+            text-align: left;
+            position: relative;
         }
         .tab-btn:hover { color: var(--fg); }
         .tab-btn.active { color: var(--accent); }
+        @media (min-width: 992px) {
+            .tab-btn.active::before {
+                content: '';
+                position: absolute;
+                left: -22px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: var(--accent);
+            }
+        }
 
-        /* タイトル */
+        /* 解説 */
+        .briefing { 
+            margin-top: 20px;
+        }
+        .briefing h4 { 
+            font-size: 11px; 
+            font-weight: 900;
+            letter-spacing: 0.15em; 
+            color: var(--accent); 
+            margin-bottom: 15px; 
+        }
+        .briefing p { 
+            font-size: 14px; 
+            font-weight: 500;
+            line-height: 1.7; 
+            color: #222;
+            text-transform: none; /* 日本語解説の可読性確保 */
+        }
+
+        /* 右エリア */
+        .stage-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
         .prog-title { 
-            font-size: 4vw; 
+            font-size: 3.5vw; 
             font-weight: 200; 
             margin-bottom: 30px; 
             letter-spacing: -0.02em;
+            line-height: 1;
+            border-bottom: 2px solid var(--fg);
+            padding-bottom: 15px;
+        }
+        @media (min-width: 992px) {
+            .prog-title {
+                font-size: 2.5vw;
+                margin-top: -10px;
+            }
         }
 
         /* コードチェーン */
         .chord-chain { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 40px; 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr);
+            border-top: 1px solid var(--fg);
+            border-left: 1px solid var(--fg);
             width: 100%;
         }
+        @media (min-width: 600px) {
+            .chord-chain {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
         .chord-box { 
-            flex: 1; 
-            padding: 20px; 
-            border: 1px solid #ddd; 
-            transition: border-color 0.2s, background-color 0.2s; 
+            padding: 40px 30px; 
+            border-right: 1px solid var(--fg); 
+            border-bottom: 1px solid var(--fg); 
+            background: var(--bg);
+            transition: all 0.2s ease; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            aspect-ratio: 1 / 1;
         }
         .chord-box:hover { 
-            border-color: var(--fg); 
-            background: #fafafa;
+            background: var(--fg);
+            color: var(--bg);
         }
+        .chord-box:hover .chord-deg {
+            color: var(--accent);
+        }
+
+        /* 【重要】コード名とディグリーは大文字小文字を厳密に区別 */
         .chord-name { 
-            font-size: 2.5vw; 
-            font-weight: 700; 
-            letter-spacing: -0.03em;
+            font-size: 3vw; 
+            font-weight: 900; 
+            letter-spacing: -0.04em;
+            line-height: 1;
+            text-transform: none; /* 大文字強制を解除 */
+        }
+        @media (max-width: 768px) {
+            .chord-name { font-size: 8vw; }
         }
         .chord-deg { 
-            font-size: 11px; 
-            color: #666; 
-            margin-top: 5px; 
-            font-family: monospace;
-        }
-
-        /* 解説（タクティカル・ブリーフィング） */
-        .briefing { 
-            max-width: 800px; 
-        }
-        .briefing h4 { 
             font-size: 12px; 
-            font-weight: 900;
-            letter-spacing: 0.1em; 
-            color: var(--accent); 
-            margin-bottom: 10px; 
-        }
-        .briefing p { 
-            font-size: 16px; 
-            font-weight: 500;
-            line-height: 1.6; 
-            color: #333;
+            color: var(--gray-muted); 
+            font-family: monospace;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+            text-transform: none; /* 大文字強制を解除 */
         }
 
-        @media (max-width: 768px) {
-            .logo { font-size: 10vw; }
-            .tab-group { gap: 15px; overflow-x: auto; white-space: nowrap; }
-            .tab-btn { font-size: 12px; }
-            .prog-title { font-size: 8vw; }
-            .chord-chain { flex-direction: column; gap: 10px; }
-            .chord-name { font-size: 6vw; }
-            .briefing p { font-size: 14px; }
+        @media (max-width: 991px) {
+            .logo { font-size: 8vw; }
+            .prog-title { font-size: 6vw; }
+            header { margin-bottom: 30px; }
         }
     </style>
 </head>
@@ -150,36 +220,58 @@
     </header>
 
     <main>
-        <div class="tab-group">
-            <button class="tab-btn active" onclick="switchProgression('major', event)">II-V-I-VI</button>
-            <button class="tab-btn" onclick="switchProgression('sdm', event)">SUB-DOM MINOR</button>
-            <button class="tab-btn" onclick="switchProgression('backdoor', event)">BACKDOOR</button>
+        <!-- 左：コントロール ＆ ナビゲーション -->
+        <div class="control-panel">
+            <div class="tab-group">
+                <button class="tab-btn active" onclick="switchProgression('major', event)">II-V-I-VI</button>
+                <button class="tab-btn" onclick="switchProgression('sdm', event)">SUB-DOM MINOR</button>
+                <button class="tab-btn" onclick="switchProgression('backdoor', event)">BACKDOOR</button>
+            </div>
+
+            <div class="briefing">
+                <h4>TACTICAL BRIEFING</h4>
+                <p id="analysisText">LOADING...</p>
+            </div>
         </div>
 
-        <div id="progTitle" class="prog-title">LOADING...</div>
-        <div class="chord-chain" id="chordChain"></div>
-        
-        <div class="briefing">
-            <h4>TACTICAL BRIEFING</h4>
-            <p id="analysisText">LOADING...</p>
+        <!-- 右：視覚的メイン -->
+        <div class="stage-panel">
+            <div id="progTitle" class="prog-title">LOADING...</div>
+            <div class="chord-chain" id="chordChain"></div>
         </div>
     </main>
 
     <script>
+        // ディグリーネームの大文字（Major）・小文字（minor）を音楽理論に基づいて厳密に定義
         const progressions = {
             major: {
                 title: "Major II-V-I-VI",
-                chords: [{name:"IIm7",deg:"2nd"},{name:"V7",deg:"5th"},{name:"IM7",deg:"1st"},{name:"VI7",deg:"6th"}],
+                chords: [
+                    { name: "IIm7", deg: "iim7" },
+                    { name: "V7",   deg: "V7" },
+                    { name: "IM7",  deg: "IM7" },
+                    { name: "VI7",  deg: "VI7" }
+                ],
                 briefing: "ジャズの標準装備。V7の3度と7度が、IM7のルートと3度へ滑り込むガイドトーンを指板上でなぞる感覚を磨いてください。"
             },
             sdm: {
                 title: "Subdominant Minor",
-                chords: [{name:"IVM7",deg:"4th"},{name:"IVm7",deg:"4m"},{name:"IIIm7",deg:"3rd"},{name:"VI7",deg:"6th"}],
+                chords: [
+                    { name: "IVM7", deg: "IVM7" },
+                    { name: "IVm7", deg: "ivm7" },
+                    { name: "IIIm7",deg: "iiim7" },
+                    { name: "VI7",  deg: "VI7" }
+                ],
                 briefing: "メジャーからマイナーへの『半音降下』が鍵。切ない響きを指板のどこで鳴らすか、ポジションの選択がソロの命運を分けます。"
             },
             backdoor: {
                 title: "Backdoor Dominant",
-                chords: [{name:"IIm7",deg:"2nd"},{name:"♭VII7",deg:"♭7th"},{name:"IM7",deg:"1st"},{name:"IM7",deg:"1st"}],
+                chords: [
+                    { name: "IIm7",   deg: "iim7" },
+                    { name: "♭VII7", deg: "♭VII7" },
+                    { name: "IM7",    deg: "IM7" },
+                    { name: "IM7",    deg: "IM7" }
+                ],
                 briefing: "裏口からの奇襲。♭VII7が持つ独特の浮遊感を活かし、無理にドミナントで解決せず、優しくトニックへ着地させるモダンなアプローチ。"
             }
         };
@@ -193,7 +285,7 @@
             document.getElementById('chordChain').innerHTML = prog.chords.map(c => `
                 <div class="chord-box">
                     <div class="chord-name">${c.name}</div>
-                    <div class="chord-deg">${c.deg}</div>
+                    <div class="chord-deg">// ${c.deg}</div>
                 </div>
             `).join('');
         }
