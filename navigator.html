@@ -53,13 +53,13 @@
 
         @media (min-width: 992px) {
             main {
-                grid-template-columns: 350px 1fr;
+                grid-template-columns: 380px 1fr;
                 column-gap: 80px;
                 align-items: start;
             }
         }
 
-        /* 左エリア */
+        /* 左エリア：ナビゲーション ＆ タクティカルブリーフィング */
         .control-panel {
             display: flex;
             flex-direction: column;
@@ -68,7 +68,7 @@
         .tab-group { 
             display: flex; 
             flex-direction: row;
-            gap: 20px; 
+            gap: 12px; 
             margin-bottom: 40px; 
             border-bottom: 1px solid var(--fg);
             padding-bottom: 15px;
@@ -87,7 +87,7 @@
         .tab-btn { 
             background: none; 
             border: none; 
-            font-size: 13px; 
+            font-size: 11px; 
             font-weight: 900; 
             color: var(--gray-muted); 
             cursor: pointer; 
@@ -130,7 +130,7 @@
             text-transform: none; /* 日本語解説の可読性確保 */
         }
 
-        /* 右エリア */
+        /* 右エリア：進行タイトル ＆ コードチェーン */
         .stage-panel {
             display: flex;
             flex-direction: column;
@@ -185,7 +185,7 @@
             color: var(--accent);
         }
 
-        /* 【重要】コード名とディグリーは大文字小文字を厳密に区別 */
+        /* コード名とディグリーは大文字小文字を厳密に区別（Major = 大文字 / minor = 小文字） */
         .chord-name { 
             font-size: 3vw; 
             font-weight: 900; 
@@ -223,9 +223,12 @@
         <!-- 左：コントロール ＆ ナビゲーション -->
         <div class="control-panel">
             <div class="tab-group">
-                <button class="tab-btn active" onclick="switchProgression('major', event)">II-V-I-VI</button>
+                <button class="tab-btn active" onclick="switchProgression('major251', event)">MAJOR II-V-I</button>
+                <button class="tab-btn" onclick="switchProgression('minor251', event)">MINOR II-V-I</button>
+                <button class="tab-btn" onclick="switchProgression('pass251', event)">#IVm7(♭5) PASSING</button>
+                <button class="tab-btn" onclick="switchProgression('backdoor', event)">BACKDOOR DOMINANT</button>
                 <button class="tab-btn" onclick="switchProgression('sdm', event)">SUB-DOM MINOR</button>
-                <button class="tab-btn" onclick="switchProgression('backdoor', event)">BACKDOOR</button>
+                <button class="tab-btn" onclick="switchProgression('secondary', event)">SECONDARY DOMINANT</button>
             </div>
 
             <div class="briefing">
@@ -234,7 +237,7 @@
             </div>
         </div>
 
-        <!-- 右：視覚的メイン -->
+        <!-- 右：視覚的メイン（コード進行表示） -->
         <div class="stage-panel">
             <div id="progTitle" class="prog-title">LOADING...</div>
             <div class="chord-chain" id="chordChain"></div>
@@ -242,37 +245,67 @@
     </main>
 
     <script>
-        // ディグリーネームの大文字（Major）・小文字（minor）を音楽理論に基づいて厳密に定義
+        // 大文字小文字（Major/minor）を完全に区別した音楽理論データ
         const progressions = {
-            major: {
-                title: "Major II-V-I-VI",
+            major251: {
+                title: "Major II-V-I",
                 chords: [
                     { name: "IIm7", deg: "iim7" },
                     { name: "V7",   deg: "V7" },
                     { name: "IM7",  deg: "IM7" },
-                    { name: "VI7",  deg: "VI7" }
+                    { name: "IM7",  deg: "IM7" }
                 ],
-                briefing: "ジャズの標準装備。V7の3度と7度が、IM7のルートと3度へ滑り込むガイドトーンを指板上でなぞる感覚を磨いてください。"
+                briefing: "ジャズの最重要基盤。V7の3度と7度が、IM7のルートと3度へと半音で滑り込むガイドトーンの動きを指板上で完全に捉えてください。"
             },
-            sdm: {
-                title: "Subdominant Minor",
+            minor251: {
+                title: "Minor II-V-I",
                 chords: [
-                    { name: "IVM7", deg: "IVM7" },
-                    { name: "IVm7", deg: "ivm7" },
-                    { name: "IIIm7",deg: "iiim7" },
-                    { name: "VI7",  deg: "VI7" }
+                    { name: "IIm7(♭5)", deg: "iim7(♭5)" },
+                    { name: "V7(♭9)",   deg: "V7(♭9)" },
+                    { name: "Im7",       deg: "im7" },
+                    { name: "Im7",       deg: "im7" }
                 ],
-                briefing: "メジャーからマイナーへの『半音降下』が鍵。切ない響きを指板のどこで鳴らすか、ポジションの選択がソロの命運を分けます。"
+                briefing: "マイナーキーにおける2-5-1。iim7(♭5)の5度（♭5）からV7の短9度（♭9）を経由する、暗く緊張感のあるラインがソロギターのキモとなります。"
+            },
+            pass251: {
+                title: "#IVm7(♭5) → VII7 → IIIm7",
+                chords: [
+                    { name: "#IVm7(♭5)", deg: "♯ivm7(♭5)" },
+                    { name: "VII7",       deg: "VII7" },
+                    { name: "IIIm7",     deg: "iiim7" },
+                    { name: "IIIm7",     deg: "iiim7" }
+                ],
+                briefing: "トニックの代理であるIIIm7へ向かうパッシング2-5-1。#IVm7(♭5)のルートからVII7を経てIIIm7へ着地する、ベースラインのスムーズな流れとパッシング特有の浮遊感を意識してください。"
             },
             backdoor: {
                 title: "Backdoor Dominant",
                 chords: [
-                    { name: "IIm7",   deg: "iim7" },
+                    { name: "IVm7",   deg: "ivm7" },
                     { name: "♭VII7", deg: "♭VII7" },
                     { name: "IM7",    deg: "IM7" },
                     { name: "IM7",    deg: "IM7" }
                 ],
-                briefing: "裏口からの奇襲。♭VII7が持つ独特の浮遊感を活かし、無理にドミナントで解決せず、優しくトニックへ着地させるモダンなアプローチ。"
+                briefing: "トニックIM7へ『裏口』からアプローチする現代的なドミナント。♭VII7へ繋がるリレイテッド IIm7 として機能する IVm7 からの滑らかな流れを意識します。"
+            },
+            sdm: {
+                title: "Subdominant Minor",
+                chords: [
+                    { name: "IVM7",  deg: "IVM7" },
+                    { name: "IVm7",  deg: "ivm7" },
+                    { name: "IIIm7", deg: "iiim7" },
+                    { name: "VI7",   deg: "VI7" }
+                ],
+                briefing: "IVM7からIVm7（サブドミナントマイナー）への『半音降下』が美しいライン。哀愁を帯びた特徴的な音を指板のどこで強調するかが命運を分けます。"
+            },
+            secondary: {
+                title: "Secondary Dominant (I-III7)",
+                chords: [
+                    { name: "IM7",  deg: "IM7" },
+                    { name: "III7", deg: "III7" },
+                    { name: "VIm7", deg: "vim7" },
+                    { name: "VIm7", deg: "vim7" }
+                ],
+                briefing: "本来マイナーコードであるべきIIIの度数をドミナント（III7）化し、vim7への強い推進力を生み出す定番モーション。III7に含まれる調外の音（#5th）をソロでどう歌わせるかがポイントです。"
             }
         };
 
@@ -290,8 +323,8 @@
             `).join('');
         }
         
-        // 初期化
-        switchProgression('major');
+        // 初期起動
+        switchProgression('major251');
     </script>
 </body>
 </html>
